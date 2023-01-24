@@ -21,37 +21,37 @@ public interface IJsonElement :
     IEquatable<ulong>
 {
     JsonElementType Type { get; }
-    IJsonArray? AsArray { get; }
-    IJsonObject? AsObject { get; }
-    double? AsDouble { get; }
-    float? AsFloat { get; }
-    sbyte? AsSByte { get; }
-    short? AsShort { get; }
-    int? AsInt { get; }
-    long? AsLong { get; }
-    byte? AsByte { get; }
-    ushort? AsUShort { get; }
-    uint? AsUInt { get; }
-    ulong? AsULong { get; }
-    decimal? AsDecimal { get; }
-    string? AsString { get; }
-    bool? AsBool { get; }
+    IJsonArray? asArray { get; }
+    IJsonObject? asObject { get; }
+    double? asDouble { get; }
+    float? asFloat { get; }
+    sbyte? asSByte { get; }
+    short? asShort { get; }
+    int? asInt { get; }
+    long? asLong { get; }
+    byte? asByte { get; }
+    ushort? asUShort { get; }
+    uint? asUInt { get; }
+    ulong? asULong { get; }
+    decimal? asDecimal { get; }
+    string? asString { get; }
+    bool? asBool { get; }
 
-    IJsonArray Array { get; }
-    IJsonObject Object { get; }
-    double Double { get; }
-    float Float { get; }
-    sbyte SByte { get; }
-    short Short { get; }
-    int Int { get; }
-    long Long { get; }
-    byte Byte { get; }
-    ushort UShort { get; }
-    uint UInt { get; }
-    ulong ULong { get; }
-    decimal Decimal { get; }
-    string String { get; }
-    bool Bool { get; }
+    IJsonArray toArray { get; }
+    IJsonObject toObject { get; }
+    double toDouble { get; }
+    float toFloat { get; }
+    sbyte toSByte { get; }
+    short toShort { get; }
+    int toInt { get; }
+    long toLong { get; }
+    byte toByte { get; }
+    ushort toUShort { get; }
+    uint toUInt { get; }
+    ulong toULong { get; }
+    decimal toDecimal { get; }
+    string toString { get; }
+    bool toBool { get; }
 
     bool IsNull => Type == JsonElementType.Null;
     bool IsBool => Type == JsonElementType.Bool;

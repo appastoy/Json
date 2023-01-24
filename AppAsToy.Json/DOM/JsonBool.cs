@@ -9,8 +9,8 @@
 
         public override JsonElementType Type => JsonElementType.Bool;
 
-        public override bool? AsBool => Value;
-        public override bool Bool => Value;
+        public override bool? asBool => Value;
+        public override bool toBool => Value;
 
         private JsonBool(bool value) => Value = value;
 

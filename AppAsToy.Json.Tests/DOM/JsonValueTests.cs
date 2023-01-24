@@ -19,18 +19,18 @@ public class JsonValueTests
     [Fact]
     public void Number()
     {
-        JsonNumber.Zero.AsDouble.Should().Be(0.0d);
-        var number1 = new JsonNumber(0.1d); number1.AsDouble.Should().Be(0.1d);
-        var number2 = new JsonNumber(0.1f); number2.AsFloat.Should().Be(0.1f);
-        var number3 = new JsonNumber(sbyte.MaxValue); number3.AsSByte.Should().Be(sbyte.MaxValue);
-        var number4 = new JsonNumber(short.MaxValue); number4.AsShort.Should().Be(short.MaxValue);
-        var number5 = new JsonNumber(int.MaxValue); number5.AsInt.Should().Be(int.MaxValue);
-        var number6 = new JsonNumber(long.MaxValue >> 12); number6.AsLong.Should().Be(long.MaxValue >> 12);
-        var number7 = new JsonNumber(byte.MaxValue); number7.AsByte.Should().Be(byte.MaxValue);
-        var number8 = new JsonNumber(ushort.MaxValue); number8.AsUShort.Should().Be(ushort.MaxValue);
-        var number9 = new JsonNumber(uint.MaxValue); number9.AsUInt.Should().Be(uint.MaxValue);
-        var number10 = new JsonNumber(ulong.MaxValue >> 12); number10.AsULong.Should().Be(ulong.MaxValue >> 12);
-        var number11 = new JsonNumber(1234m); number11.AsDecimal.Should().Be(1234m);
+        JsonNumber.Zero.asDouble.Should().Be(0.0d);
+        var number1 = new JsonNumber(0.1d); number1.asDouble.Should().Be(0.1d);
+        var number2 = new JsonNumber(0.1f); number2.asFloat.Should().Be(0.1f);
+        var number3 = new JsonNumber(sbyte.MaxValue); number3.asSByte.Should().Be(sbyte.MaxValue);
+        var number4 = new JsonNumber(short.MaxValue); number4.asShort.Should().Be(short.MaxValue);
+        var number5 = new JsonNumber(int.MaxValue); number5.asInt.Should().Be(int.MaxValue);
+        var number6 = new JsonNumber(long.MaxValue >> 12); number6.asLong.Should().Be(long.MaxValue >> 12);
+        var number7 = new JsonNumber(byte.MaxValue); number7.asByte.Should().Be(byte.MaxValue);
+        var number8 = new JsonNumber(ushort.MaxValue); number8.asUShort.Should().Be(ushort.MaxValue);
+        var number9 = new JsonNumber(uint.MaxValue); number9.asUInt.Should().Be(uint.MaxValue);
+        var number10 = new JsonNumber(ulong.MaxValue >> 12); number10.asULong.Should().Be(ulong.MaxValue >> 12);
+        var number11 = new JsonNumber(1234m); number11.asDecimal.Should().Be(1234m);
 
         ((IJsonElement)(JsonElement)0.1d).Should().Be(number1);
         ((IJsonElement)(JsonElement)0.1f).Should().Be(number2);

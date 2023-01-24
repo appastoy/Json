@@ -33,8 +33,8 @@ namespace AppAsToy.Json.DOM
 
         public override int Count => _items.Count;
 
-        public override JsonArray? AsArray => this;
-        public override JsonArray Array => this;
+        public override JsonArray? asArray => this;
+        public override JsonArray toArray => this;
 
 
         public JsonArray()

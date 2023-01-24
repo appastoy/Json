@@ -13,8 +13,8 @@ namespace AppAsToy.Json.DOM
         public string Value { get; }
 
         public override JsonElementType Type => JsonElementType.String;
-        public override string? AsString => Value;
-        public override string String => Value;
+        public override string? asString => Value;
+        public override string toString => Value;
 
         public JsonString(string value)
         {

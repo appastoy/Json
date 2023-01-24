@@ -37,8 +37,8 @@ namespace AppAsToy.Json.DOM
         public override ICollection<string> Keys => _propertyMap.Keys;
         public override ICollection<JsonElement> Values => _propertyMap.Values;
 
-        public override JsonObject? AsObject => this;
-        public override JsonObject Object => this;
+        public override JsonObject? asObject => this;
+        public override JsonObject toObject => this;
 
         public JsonObject()
         {
