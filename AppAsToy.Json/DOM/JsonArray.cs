@@ -8,45 +8,53 @@ using System.Linq;
 
 namespace AppAsToy.Json.DOM
 {
-    public sealed class JsonArray : JsonElement, IReadOnlyList<JsonElement>
+    public sealed class JsonArray : JsonElement, IJsonArray
     {
-        public static JsonArray Empty { get; } = new JsonArray(Array.Empty<JsonElement>());
-
-        private JsonElement[] _items;
+        private readonly List<JsonElement> _items;
 
         public override JsonElementType Type => JsonElementType.Array;
 
         public override JsonElement? this[int index]
         {
             get => _items[index];
-            init
+            set
             {
-                if (index < 0 || index > _items.Length)
+                if (index < 0 || index > _items.Count)
                     throw new ArgumentOutOfRangeException(nameof(index), index, "index out of range.");
 
-                if (index == _items.Length)
-                    Array.Resize(ref _items, _items.Length + 1);
-                _items[index] = value ?? Null;
+                if (index == _items.Count)
+                    _items.Add(value ?? Null);
+                else
+                    _items[index] = value ?? Null;
             }
         }
 
-        public override int Count => _items.Length;
+        public override int Count => _items.Count;
 
         public JsonArray()
         {
-            _items = Array.Empty<JsonElement>();
+            _items = new List<JsonElement>();
         }
 
         public JsonArray(params JsonElement?[] items)
         {
-            _items = items.Select(item => item ?? Null).ToArray();
+            _items = items.Select(item => item ?? Null).ToList();
         }
 
         public JsonArray(IEnumerable<JsonElement?> items)
         {
-            _items = items?.Select(item => item ?? Null).ToArray() 
+            _items = items?.Select(item => item ?? Null).ToList()
                 ?? throw new ArgumentNullException(nameof(items));
         }
+
+        public override int IndexOf(JsonElement item) => _items.IndexOf(item);
+        public override void Insert(int index, JsonElement item) => _items.Insert(index, item);
+        public override void RemoveAt(int index) => _items.RemoveAt(index);
+        public override void Add(JsonElement item) => _items.Add(item);
+        public override void Clear() => _items.Clear();
+        public override bool Contains(JsonElement item) => _items.Contains(item);
+        public override void CopyTo(JsonElement[] array, int arrayIndex) => _items.CopyTo(array, arrayIndex);
+        public override bool Remove(JsonElement item) => _items.Remove(item);
 
         public override ArrayEnumerator<JsonElement> GetEnumerator()
         {
@@ -76,7 +84,7 @@ namespace AppAsToy.Json.DOM
         protected override bool IsEqual(JsonElement? element)
         {
             return element is JsonArray array &&
-                array.Count == _items.Length &&
+                array.Count == _items.Count &&
                 array._items.SequenceEqual(_items);
         }
 

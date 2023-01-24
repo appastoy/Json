@@ -8,7 +8,7 @@ namespace AppAsToy.Json.DOM
         public static JsonNumber MinValue { get; } = new JsonNumber(double.MinValue);
         public static JsonNumber MaxValue { get; } = new JsonNumber(double.MaxValue);
 
-        private double _value;
+        private readonly double _value;
 
         public override JsonElementType Type => JsonElementType.Number;
 

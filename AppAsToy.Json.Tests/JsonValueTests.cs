@@ -32,17 +32,17 @@ public class JsonValueTests
         var number10 = new JsonNumber(ulong.MaxValue >> 12); number10.AsULong.Should().Be(ulong.MaxValue >> 12);
         var number11 = new JsonNumber(1234m); number11.AsDecimal.Should().Be(1234m);
         
-        ((JsonElement)0.1d).Should().Be(number1);
-        ((JsonElement)0.1f).Should().Be(number2);
-        ((JsonElement)sbyte.MaxValue).Should().Be(number3);
-        ((JsonElement)short.MaxValue).Should().Be(number4);
-        ((JsonElement)int.MaxValue).Should().Be(number5);
-        ((JsonElement)(long.MaxValue >> 12)).Should().Be(number6);
-        ((JsonElement)byte.MaxValue).Should().Be(number7);
-        ((JsonElement)ushort.MaxValue).Should().Be(number8);
-        ((JsonElement)uint.MaxValue).Should().Be(number9);
-        ((JsonElement)(ulong.MaxValue >> 12)).Should().Be(number10);
-        ((JsonElement)1234m).Should().Be(number11);
+        ((IJsonElement)(JsonElement)0.1d).Should().Be(number1);
+        ((IJsonElement)(JsonElement)0.1f).Should().Be(number2);
+        ((IJsonElement)(JsonElement)sbyte.MaxValue).Should().Be(number3);
+        ((IJsonElement)(JsonElement)short.MaxValue).Should().Be(number4);
+        ((IJsonElement)(JsonElement)int.MaxValue).Should().Be(number5);
+        ((IJsonElement)(JsonElement)(long.MaxValue >> 12)).Should().Be(number6);
+        ((IJsonElement)(JsonElement)byte.MaxValue).Should().Be(number7);
+        ((IJsonElement)(JsonElement)ushort.MaxValue).Should().Be(number8);
+        ((IJsonElement)(JsonElement)uint.MaxValue).Should().Be(number9);
+        ((IJsonElement)(JsonElement)(ulong.MaxValue >> 12)).Should().Be(number10);
+        ((IJsonElement)(JsonElement)1234m).Should().Be(number11);
 
         number1.Equals(0.1d).Should().BeTrue();
         number2.Equals(0.1f).Should().BeTrue();
@@ -91,7 +91,7 @@ public class JsonValueTests
         new Action(() => new JsonString(null)).Should().Throw<ArgumentNullException>();
 #pragma warning restore CS8625
 
-        ((JsonElement)"abc").Should().Be(str1);
+        ((IJsonElement)(JsonElement)"abc").Should().Be(str1);
 
         str1.Equals("abc").Should().BeTrue();
         (str1 == "abc").Should().BeTrue();
@@ -104,8 +104,8 @@ public class JsonValueTests
         JsonBool.True.Value.Should().BeTrue();
         JsonBool.False.Value.Should().BeFalse();
 
-        ((JsonElement)true).Should().Be(JsonBool.True);
-        ((JsonElement)false).Should().Be(JsonBool.False);
+        ((IJsonElement)(JsonElement)true).Should().Be(JsonBool.True);
+        ((IJsonElement)(JsonElement)false).Should().Be(JsonBool.False);
 
         JsonBool.True.Equals(true).Should().BeTrue();
         (JsonBool.True == true).Should().BeTrue();

@@ -11,41 +11,29 @@ using System.Runtime.CompilerServices;
 namespace AppAsToy.Json.DOM
 {
 
-    public abstract class JsonElement :
-        IReadOnlyList<JsonElement>,
-        IReadOnlyDictionary<string, JsonElement>,
-        IEquatable<JsonElement>,
-        IEquatable<string>,
-        IEquatable<bool>,
-        IEquatable<float>,
-        IEquatable<double>,
-        IEquatable<decimal>,
-        IEquatable<sbyte>,
-        IEquatable<short>,
-        IEquatable<int>,
-        IEquatable<long>,
-        IEquatable<byte>,
-        IEquatable<ushort>,
-        IEquatable<uint>,
-        IEquatable<ulong>
+    public abstract class JsonElement : IJsonElement, IList<JsonElement>, IDictionary<string, JsonElement>
     {
         public static JsonElement Null { get; } = JsonNull.Instance;
         public abstract JsonElementType Type { get; }
-
         public virtual int Count => 0;
-        public virtual IEnumerable<string> Keys => Enumerable.Empty<string>();
-        public virtual IEnumerable<JsonElement> Values => Enumerable.Empty<JsonElement>();
+        public bool IsReadOnly => false;
+        public virtual ICollection<string> Keys => Array.Empty<string>();
+        public virtual ICollection<JsonElement> Values => Array.Empty<JsonElement>();
+        IEnumerable<string> IReadOnlyDictionary<string, JsonElement>.Keys => Keys;
+        IEnumerable<JsonElement> IReadOnlyDictionary<string, JsonElement>.Values => Values;
+
         public virtual JsonElement this[string key]
         {
             get => throw new NotImplementedException();
-            init => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         public virtual JsonElement this[int index]
         {
             get => throw new NotImplementedException();
-            init => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
+
         public virtual bool ContainsKey(string key) => false;
         public virtual bool TryGetValue(string key, out JsonElement value) { value = default; return false; }
         public virtual string ToString(bool writeIndented) => ToString();
@@ -69,7 +57,7 @@ namespace AppAsToy.Json.DOM
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return value.Length == 0 ? JsonArray.Empty : new JsonArray(value);
+            return value.Length == 0 ? new JsonArray() : new JsonArray(value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,13 +66,13 @@ namespace AppAsToy.Json.DOM
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return value.Length == 0 ? JsonObject.Empty : new JsonObject(value);
+            return value.Length == 0 ? new JsonObject() : new JsonObject(value);
         }
 
         protected abstract bool IsEqual(JsonElement? element);
         public bool Equals(JsonElement? other) => IsEqual(other);
-        public override bool Equals(object other) => 
-            (other == null && Type == JsonElementType.Null) ||  
+        public override bool Equals(object other) =>
+            (other == null && Type == JsonElementType.Null) ||
             (other is JsonElement element && Equals(element));
         public virtual bool Equals(string? other) => false;
         public virtual bool Equals(bool other) => false;
@@ -123,7 +111,27 @@ namespace AppAsToy.Json.DOM
 
             return left!.Equals(right);
         }
-        
+
+        public virtual int IndexOf(JsonElement item) => throw new NotImplementedException();
+        public virtual void Insert(int index, JsonElement item) => throw new NotImplementedException();
+        public virtual void RemoveAt(int index) => throw new NotImplementedException();
+        public virtual void Add(JsonElement item) => throw new NotImplementedException();
+        public virtual void Clear() => throw new NotImplementedException();
+        public virtual bool Contains(JsonElement item) => throw new NotImplementedException();
+        public virtual void CopyTo(JsonElement[] array, int arrayIndex) => throw new NotImplementedException();
+        public virtual bool Remove(JsonElement item) => throw new NotImplementedException();
+
+        public virtual void Add(string key, JsonElement value) => throw new NotImplementedException();
+        public virtual bool Remove(string key) => throw new NotImplementedException();
+        protected virtual void Add(KeyValuePair<string, JsonElement> item) => throw new NotImplementedException();
+        protected virtual bool Contains(KeyValuePair<string, JsonElement> item) => throw new NotImplementedException();
+        protected virtual void CopyTo(KeyValuePair<string, JsonElement>[] array, int arrayIndex) => throw new NotImplementedException();
+        protected virtual bool Remove(KeyValuePair<string, JsonElement> item) => throw new NotImplementedException();
+
+        void ICollection<KeyValuePair<string, JsonElement>>.Add(KeyValuePair<string, JsonElement> item) => Add(item);
+        bool ICollection<KeyValuePair<string, JsonElement>>.Contains(KeyValuePair<string, JsonElement> item) => Contains(item);
+        void ICollection<KeyValuePair<string, JsonElement>>.CopyTo(KeyValuePair<string, JsonElement>[] array, int arrayIndex) => CopyTo(array, arrayIndex);
+        bool ICollection<KeyValuePair<string, JsonElement>>.Remove(KeyValuePair<string, JsonElement> item) => Remove(item);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, JsonElement? right) => Equals(left, right);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, float right) => left?.Equals(right) ?? false;

@@ -11,10 +11,7 @@
 
         private JsonBool(bool value) => Value = value;
 
-        public override string ToString()
-        {
-            return Value ? "true" : "false";
-        }
+        public override string ToString() => Value ? "true" : "false";
 
         protected override bool IsEqual(JsonElement? element) 
             => element is JsonBool jsonBool && jsonBool.Value == Value;
