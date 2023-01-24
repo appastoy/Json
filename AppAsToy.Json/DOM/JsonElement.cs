@@ -11,7 +11,36 @@ namespace AppAsToy.Json.DOM
 {
     public abstract class JsonElement : IJsonElement
     {
+        #region Static Stuffs
+        
         public static JsonElement Null { get; } = JsonNull.Shared;
+
+        public static bool TryParse(string json, out IJsonElement element)
+        {
+            if (json == null)
+                throw new ArgumentNullException(nameof(json));
+
+            try 
+            {
+                element = Parse(json);
+                return true;
+            }
+            catch
+            {
+                element = default;
+                return false;
+            }
+        }
+
+        public static IJsonElement Parse(string json)
+        {
+            if (json == null)
+                throw new ArgumentNullException(nameof(json));
+
+            return new JsonElementParser(json).Parse();
+        }
+
+        #endregion Static Stuffs
 
         #region Common Interfaces
 

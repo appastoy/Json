@@ -37,7 +37,7 @@ namespace AppAsToy.Json.DOM
         {
             _builder.Clear();
 
-            if (element == null)
+            if (element is null)
                 return "null";
 
             if (element is JsonArray array)
@@ -52,7 +52,7 @@ namespace AppAsToy.Json.DOM
 
         private void SerializeElement(JsonElement? element, int depth)
         {
-            if (element == null)
+            if (element is null)
                 _builder.Append("null");
             else if (element is JsonArray array)
                 SerializeArray(array, depth);
