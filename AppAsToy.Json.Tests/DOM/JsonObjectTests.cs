@@ -1,6 +1,6 @@
 ﻿using AppAsToy.Json.DOM;
 
-namespace AppAsToy.Json.Tests;
+namespace AppAsToy.Json.Tests.DOM;
 public class JsonObjectTests
 {
     [Fact]
@@ -87,7 +87,7 @@ public class JsonObjectTests
     [Fact]
     public void InitializeByProperty()
     {
-        JsonObject @object = new ()
+        JsonObject @object = new()
         {
             ["a"] = 1,
             ["b"] = "a",

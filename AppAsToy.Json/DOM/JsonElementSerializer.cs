@@ -1,9 +1,8 @@
-﻿using AppAsToy.Json.DOM;
-using System.Text;
+﻿using System.Text;
 
-namespace AppAsToy.Json
+namespace AppAsToy.Json.DOM
 {
-    internal struct JsonSerializer
+    internal struct JsonElementSerializer
     {
         private static readonly string[] _indents =
         {
@@ -28,7 +27,7 @@ namespace AppAsToy.Json
         private bool _writeIndented;
         private StringBuilder _builder;
 
-        public JsonSerializer(bool writeIndented)
+        public JsonElementSerializer(bool writeIndented)
         {
             _writeIndented = writeIndented;
             _builder = new StringBuilder(4096);
@@ -104,7 +103,7 @@ namespace AppAsToy.Json
 
         private void SerializeProperty(JsonProperty property, int depth)
         {
-            _builder.Append(property.Name);
+            _builder.Append(JsonString.ConvertToJson(property.Name));
             AppendColon();
             SerializeElement(property.Value, depth);
         }
@@ -134,7 +133,7 @@ namespace AppAsToy.Json
         {
             if (!_writeIndented)
                 _builder.Append(':');
-            else 
+            else
                 _builder.Append(": ");
         }
 

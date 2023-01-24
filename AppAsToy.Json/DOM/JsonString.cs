@@ -13,20 +13,25 @@ namespace AppAsToy.Json.DOM
         public string Value { get; }
 
         public override JsonElementType Type => JsonElementType.String;
+        public override string? AsString => Value;
+        public override string String => Value;
 
         public JsonString(string value)
         {
             Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        public override string ToString()
+        public override string ToString() => ConvertToJson(Value);
+
+        public static string ConvertToJson(string value)
         {
-            if (Value.Length == 0)
+            if (value.Length == 0)
                 return "\"\"";
 
-            var escapedString = _escapeCharsRE.Replace(Value, m =>
+            var escapedString = _escapeCharsRE.Replace(value, m =>
                 m.Value[0] switch
                 {
+                    '"' => "\\\"",
                     '\\' => "\\\\",
                     '/' => "\\/",
                     '\b' => "\\b",
@@ -34,8 +39,8 @@ namespace AppAsToy.Json.DOM
                     '\n' => "\\n",
                     '\r' => "\\r",
                     '\t' => "\\t",
-                    _ => throw new NotImplementedException()
-                });
+                    _ => m.Value[0].ToString()
+                }); ;
 
             return $"\"{escapedString}\"";
         }

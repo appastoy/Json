@@ -8,8 +8,10 @@ using System.Linq;
 
 namespace AppAsToy.Json.DOM
 {
-    public sealed class JsonObject : JsonElement, IJsonObject
+    public sealed class JsonObject : JsonElement, IJsonObject, IDictionary<string, JsonElement>
     {
+        public static IJsonObject Empty { get; } = new JsonObject();
+
         private List<JsonProperty> _properties;
         private Dictionary<string, JsonElement> _propertyMap;
 
@@ -32,10 +34,11 @@ namespace AppAsToy.Json.DOM
         }
 
         public override int Count => _properties.Count;
-
         public override ICollection<string> Keys => _propertyMap.Keys;
-
         public override ICollection<JsonElement> Values => _propertyMap.Values;
+
+        public override JsonObject? AsObject => this;
+        public override JsonObject Object => this;
 
         public JsonObject()
         {
@@ -107,24 +110,28 @@ namespace AppAsToy.Json.DOM
             return false;
         }
 
-        IEnumerator<KeyValuePair<string, JsonElement>> IEnumerable<KeyValuePair<string, JsonElement>>.GetEnumerator()
+        public ArrayEnumerator<JsonProperty> GetEnumerator() => new ArrayEnumerator<JsonProperty>(_properties);
+        
+        protected override IEnumerator<KeyValuePair<string, JsonElement>> GetReferenceKeyValueEnumerator()
         {
             return ((IEnumerable<KeyValuePair<string, JsonElement>>)_propertyMap).GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        protected override IEnumerator<KeyValuePair<string, IJsonElement>> GetReadOnlyReferenceKeyValueEnumerator()
         {
-            return _properties.GetEnumerator();
+            return _propertyMap.Select(kv => new KeyValuePair<string, IJsonElement>(kv.Key, kv.Value)).GetEnumerator();
         }
 
-        public override string ToString()
+        protected override IEnumerator GetBaseEnumerator()
         {
-            return ToString(true);
+            return ((IEnumerable)_properties).GetEnumerator();
         }
+
+        public override string ToString() => ToString(true);
 
         public override string ToString(bool writeIndented)
         {
-            return new JsonSerializer(writeIndented).Serialize(this);
+            return new JsonElementSerializer(writeIndented).Serialize(this);
         }
 
         protected override bool IsEqual(JsonElement? element)

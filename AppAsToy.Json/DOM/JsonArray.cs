@@ -8,8 +8,10 @@ using System.Linq;
 
 namespace AppAsToy.Json.DOM
 {
-    public sealed class JsonArray : JsonElement, IJsonArray
+    public sealed class JsonArray : JsonElement, IJsonArray, IList<JsonElement>
     {
+        public static IJsonArray Empty { get; } = new JsonArray();
+
         private readonly List<JsonElement> _items;
 
         public override JsonElementType Type => JsonElementType.Array;
@@ -30,6 +32,10 @@ namespace AppAsToy.Json.DOM
         }
 
         public override int Count => _items.Count;
+
+        public override JsonArray? AsArray => this;
+        public override JsonArray Array => this;
+
 
         public JsonArray()
         {
@@ -56,29 +62,26 @@ namespace AppAsToy.Json.DOM
         public override void CopyTo(JsonElement[] array, int arrayIndex) => _items.CopyTo(array, arrayIndex);
         public override bool Remove(JsonElement item) => _items.Remove(item);
 
-        public override ArrayEnumerator<JsonElement> GetEnumerator()
-        {
-            return new ArrayEnumerator<JsonElement>(_items);
-        }
 
-        IEnumerator<JsonElement> IEnumerable<JsonElement>.GetEnumerator()
+        public ArrayEnumerator<JsonElement> GetEnumerator() => new ArrayEnumerator<JsonElement>(_items);
+
+        ArrayEnumerator<IJsonElement> IJsonArray.GetEnumerator() => new ArrayEnumerator<IJsonElement>(_items);
+
+        protected override IEnumerator<JsonElement> GetReferenceEnumerator()
         {
             return ((IEnumerable<JsonElement>)_items).GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        protected override IEnumerator GetBaseEnumerator()
         {
-            return _items.GetEnumerator();
+            return ((IEnumerable)_items).GetEnumerator();
         }
 
-        public override string ToString()
-        {
-            return ToString(true);
-        }
+        public override string ToString() => ToString(true);
 
         public override string ToString(bool writeIndented)
         {
-            return new JsonSerializer(writeIndented).Serialize(this);
+            return new JsonElementSerializer(writeIndented).Serialize(this);
         }
 
         protected override bool IsEqual(JsonElement? element)

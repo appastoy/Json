@@ -1,7 +1,7 @@
 using AppAsToy.Json.DOM;
 
 
-namespace AppAsToy.Json.Tests;
+namespace AppAsToy.Json.Tests.DOM;
 
 public class JsonValueTests
 {
@@ -19,19 +19,19 @@ public class JsonValueTests
     [Fact]
     public void Number()
     {
-        JsonNumber.Zero.Value.Should().Be(0.0d);
-        var number1 = new JsonNumber(0.1d); number1.Value.Should().Be(0.1d);
-        var number2  = new JsonNumber(0.1f); number2.AsFloat.Should().Be(0.1f);
-        var number3  = new JsonNumber(sbyte.MaxValue); number3.AsSByte.Should().Be(sbyte.MaxValue);
-        var number4  = new JsonNumber(short.MaxValue); number4.AsShort.Should().Be(short.MaxValue);
-        var number5  = new JsonNumber(int.MaxValue); number5.AsInt.Should().Be(int.MaxValue);
-        var number6  = new JsonNumber(long.MaxValue >> 12); number6.AsLong.Should().Be(long.MaxValue >> 12);
-        var number7  = new JsonNumber(byte.MaxValue); number7.AsByte.Should().Be(byte.MaxValue);
-        var number8  = new JsonNumber(ushort.MaxValue); number8.AsUShort.Should().Be(ushort.MaxValue);
-        var number9  = new JsonNumber(uint.MaxValue); number9.AsUInt.Should().Be(uint.MaxValue);
+        JsonNumber.Zero.AsDouble.Should().Be(0.0d);
+        var number1 = new JsonNumber(0.1d); number1.AsDouble.Should().Be(0.1d);
+        var number2 = new JsonNumber(0.1f); number2.AsFloat.Should().Be(0.1f);
+        var number3 = new JsonNumber(sbyte.MaxValue); number3.AsSByte.Should().Be(sbyte.MaxValue);
+        var number4 = new JsonNumber(short.MaxValue); number4.AsShort.Should().Be(short.MaxValue);
+        var number5 = new JsonNumber(int.MaxValue); number5.AsInt.Should().Be(int.MaxValue);
+        var number6 = new JsonNumber(long.MaxValue >> 12); number6.AsLong.Should().Be(long.MaxValue >> 12);
+        var number7 = new JsonNumber(byte.MaxValue); number7.AsByte.Should().Be(byte.MaxValue);
+        var number8 = new JsonNumber(ushort.MaxValue); number8.AsUShort.Should().Be(ushort.MaxValue);
+        var number9 = new JsonNumber(uint.MaxValue); number9.AsUInt.Should().Be(uint.MaxValue);
         var number10 = new JsonNumber(ulong.MaxValue >> 12); number10.AsULong.Should().Be(ulong.MaxValue >> 12);
         var number11 = new JsonNumber(1234m); number11.AsDecimal.Should().Be(1234m);
-        
+
         ((IJsonElement)(JsonElement)0.1d).Should().Be(number1);
         ((IJsonElement)(JsonElement)0.1f).Should().Be(number2);
         ((IJsonElement)(JsonElement)sbyte.MaxValue).Should().Be(number3);
@@ -49,11 +49,11 @@ public class JsonValueTests
         number3.Equals(sbyte.MaxValue).Should().BeTrue();
         number4.Equals(short.MaxValue).Should().BeTrue();
         number5.Equals(int.MaxValue).Should().BeTrue();
-        number6.Equals((long.MaxValue >> 12)).Should().BeTrue();
+        number6.Equals(long.MaxValue >> 12).Should().BeTrue();
         number7.Equals(byte.MaxValue).Should().BeTrue();
         number8.Equals(ushort.MaxValue).Should().BeTrue();
         number9.Equals(uint.MaxValue).Should().BeTrue();
-        number10.Equals((ulong.MaxValue >> 12)).Should().BeTrue();
+        number10.Equals(ulong.MaxValue >> 12).Should().BeTrue();
         number11.Equals(1234m).Should().BeTrue();
 
         (number1 == 0.1d).Should().BeTrue();
@@ -61,23 +61,23 @@ public class JsonValueTests
         (number3 == sbyte.MaxValue).Should().BeTrue();
         (number4 == short.MaxValue).Should().BeTrue();
         (number5 == int.MaxValue).Should().BeTrue();
-        (number6 == (long.MaxValue >> 12)).Should().BeTrue();
+        (number6 == long.MaxValue >> 12).Should().BeTrue();
         (number7 == byte.MaxValue).Should().BeTrue();
         (number8 == ushort.MaxValue).Should().BeTrue();
         (number9 == uint.MaxValue).Should().BeTrue();
-        (number10 == (ulong.MaxValue >> 12)).Should().BeTrue();
+        (number10 == ulong.MaxValue >> 12).Should().BeTrue();
         (number11 == 1234m).Should().BeTrue();
 
-        (number1  != 0.1d).Should().BeFalse();
-        (number2  != 0.1f).Should().BeFalse();
-        (number3  != sbyte.MaxValue).Should().BeFalse();
-        (number4  != short.MaxValue).Should().BeFalse();
-        (number5  != int.MaxValue).Should().BeFalse();
-        (number6  != (long.MaxValue >> 12)).Should().BeFalse();
-        (number7  != byte.MaxValue).Should().BeFalse();
-        (number8  != ushort.MaxValue).Should().BeFalse();
-        (number9  != uint.MaxValue).Should().BeFalse();
-        (number10 != (ulong.MaxValue >> 12)).Should().BeFalse();
+        (number1 != 0.1d).Should().BeFalse();
+        (number2 != 0.1f).Should().BeFalse();
+        (number3 != sbyte.MaxValue).Should().BeFalse();
+        (number4 != short.MaxValue).Should().BeFalse();
+        (number5 != int.MaxValue).Should().BeFalse();
+        (number6 != long.MaxValue >> 12).Should().BeFalse();
+        (number7 != byte.MaxValue).Should().BeFalse();
+        (number8 != ushort.MaxValue).Should().BeFalse();
+        (number9 != uint.MaxValue).Should().BeFalse();
+        (number10 != ulong.MaxValue >> 12).Should().BeFalse();
         (number11 != 1234m).Should().BeFalse();
     }
 

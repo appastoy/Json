@@ -9,6 +9,9 @@
 
         public override JsonElementType Type => JsonElementType.Bool;
 
+        public override bool? AsBool => Value;
+        public override bool Bool => Value;
+
         private JsonBool(bool value) => Value = value;
 
         public override string ToString() => Value ? "true" : "false";

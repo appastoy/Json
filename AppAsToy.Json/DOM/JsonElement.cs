@@ -10,17 +10,57 @@ using System.Runtime.CompilerServices;
 
 namespace AppAsToy.Json.DOM
 {
-
-    public abstract class JsonElement : IJsonElement, IList<JsonElement>, IDictionary<string, JsonElement>
+    public abstract class JsonElement : IJsonElement, IEquatable<JsonElement>, IList<JsonElement>, IDictionary<string, JsonElement>
     {
         public static JsonElement Null { get; } = JsonNull.Instance;
         public abstract JsonElementType Type { get; }
         public virtual int Count => 0;
         public bool IsReadOnly => false;
-        public virtual ICollection<string> Keys => Array.Empty<string>();
-        public virtual ICollection<JsonElement> Values => Array.Empty<JsonElement>();
-        IEnumerable<string> IReadOnlyDictionary<string, JsonElement>.Keys => Keys;
-        IEnumerable<JsonElement> IReadOnlyDictionary<string, JsonElement>.Values => Values;
+        public virtual ICollection<string> Keys => System.Array.Empty<string>();
+        public virtual ICollection<JsonElement> Values => System.Array.Empty<JsonElement>();
+        IEnumerable<string> IReadOnlyDictionary<string, IJsonElement>.Keys => Keys;
+        IEnumerable<IJsonElement> IReadOnlyDictionary<string, IJsonElement>.Values => Values;
+
+        public virtual JsonArray? AsArray => null;
+        public virtual JsonObject? AsObject => null;
+
+        public virtual JsonArray Array => throw new NotImplementedException();
+        public virtual JsonObject Object => throw new NotImplementedException();
+
+        IJsonArray? IJsonElement.AsArray => AsArray;
+        IJsonObject? IJsonElement.AsObject => AsObject;
+        public virtual double? AsDouble => null;
+        public virtual float? AsFloat => null;
+        public virtual sbyte? AsSByte => null;
+        public virtual short? AsShort => null;
+        public virtual int? AsInt => null;
+        public virtual long? AsLong => null;
+        public virtual byte? AsByte => null;
+        public virtual ushort? AsUShort => null;
+        public virtual uint? AsUInt => null;
+        public virtual ulong? AsULong => null;
+        public virtual decimal? AsDecimal => null;
+        public virtual string? AsString => null;
+        public virtual bool? AsBool => null;
+
+        IJsonArray IJsonElement.Array => Array;
+        IJsonObject IJsonElement.Object => Object;
+        public virtual double Double => throw new NotImplementedException();
+        public virtual float Float => throw new NotImplementedException();
+        public virtual sbyte SByte => throw new NotImplementedException();
+        public virtual short Short => throw new NotImplementedException();
+        public virtual int Int => throw new NotImplementedException();
+        public virtual long Long => throw new NotImplementedException();
+        public virtual byte Byte => throw new NotImplementedException();
+        public virtual ushort UShort => throw new NotImplementedException();
+        public virtual uint UInt => throw new NotImplementedException();
+        public virtual ulong ULong => throw new NotImplementedException();
+        public virtual decimal Decimal => throw new NotImplementedException();
+        public virtual string String => throw new NotImplementedException();
+        public virtual bool Bool => throw new NotImplementedException();
+
+        IJsonElement IReadOnlyDictionary<string, IJsonElement>.this[string key] => this[key];
+        IJsonElement IReadOnlyList<IJsonElement>.this[int index] => this[index];
 
         public virtual JsonElement this[string key]
         {
@@ -36,7 +76,19 @@ namespace AppAsToy.Json.DOM
 
         public virtual bool ContainsKey(string key) => false;
         public virtual bool TryGetValue(string key, out JsonElement value) { value = default; return false; }
-        public virtual string ToString(bool writeIndented) => ToString();
+        bool IReadOnlyDictionary<string, IJsonElement>.ContainsKey(string key) => ContainsKey(key);
+        bool IReadOnlyDictionary<string, IJsonElement>.TryGetValue(string key, out IJsonElement value)
+        {
+            if (TryGetValue(key, out var _value))
+            {
+                value = _value;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public virtual string ToString(bool writeIndented) => string.Empty;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(bool value) => value ? JsonBool.True : JsonBool.False;
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(string value) => value == null ? Null : new JsonString(value);
@@ -71,6 +123,7 @@ namespace AppAsToy.Json.DOM
 
         protected abstract bool IsEqual(JsonElement? element);
         public bool Equals(JsonElement? other) => IsEqual(other);
+        bool IEquatable<IJsonElement>.Equals(IJsonElement other) => Equals(other);
         public override bool Equals(object other) =>
             (other == null && Type == JsonElementType.Null) ||
             (other is JsonElement element && Equals(element));
@@ -88,16 +141,6 @@ namespace AppAsToy.Json.DOM
         public virtual bool Equals(uint other) => false;
         public virtual bool Equals(ulong other) => false;
 
-        public virtual ArrayEnumerator<JsonElement> GetEnumerator()
-            => new ArrayEnumerator<JsonElement>(Array.Empty<JsonElement>());
-
-        IEnumerator<JsonElement> IEnumerable<JsonElement>.GetEnumerator() => Enumerable.Empty<JsonElement>().GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => Enumerable.Empty<JsonElement>().GetEnumerator();
-
-        IEnumerator<KeyValuePair<string, JsonElement>> IEnumerable<KeyValuePair<string, JsonElement>>.GetEnumerator()
-            => Enumerable.Empty<KeyValuePair<string, JsonElement>>().GetEnumerator();
-
         public static bool Equals(JsonElement? left, JsonElement? right)
         {
             var leftNull = ReferenceEquals(left, null) || left is JsonNull;
@@ -111,6 +154,24 @@ namespace AppAsToy.Json.DOM
 
             return left!.Equals(right);
         }
+
+        IEnumerator<JsonElement> IEnumerable<JsonElement>.GetEnumerator() => GetReferenceEnumerator();
+        IEnumerator<IJsonElement> IEnumerable<IJsonElement>.GetEnumerator() => GetReferenceEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetBaseEnumerator();
+
+        IEnumerator<KeyValuePair<string, JsonElement>> IEnumerable<KeyValuePair<string, JsonElement>>.GetEnumerator()
+            => GetReferenceKeyValueEnumerator();
+        IEnumerator<KeyValuePair<string, IJsonElement>> IEnumerable<KeyValuePair<string, IJsonElement>>.GetEnumerator()
+            => GetReadOnlyReferenceKeyValueEnumerator();
+
+        protected virtual IEnumerator GetBaseEnumerator() => Enumerable.Empty<JsonElement>().GetEnumerator();
+        protected virtual IEnumerator<JsonElement> GetReferenceEnumerator() => Enumerable.Empty<JsonElement>().GetEnumerator();
+        protected virtual IEnumerator<KeyValuePair<string, JsonElement>> GetReferenceKeyValueEnumerator()
+            => Enumerable.Empty<KeyValuePair<string, JsonElement>>().GetEnumerator();
+        protected virtual IEnumerator<KeyValuePair<string, IJsonElement>> GetReadOnlyReferenceKeyValueEnumerator()
+            => Enumerable.Empty<KeyValuePair<string, IJsonElement>>().GetEnumerator();
+
+        
 
         public virtual int IndexOf(JsonElement item) => throw new NotImplementedException();
         public virtual void Insert(int index, JsonElement item) => throw new NotImplementedException();

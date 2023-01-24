@@ -1,6 +1,6 @@
 ﻿using AppAsToy.Json.DOM;
 
-namespace AppAsToy.Json.Tests;
+namespace AppAsToy.Json.Tests.DOM;
 public class JsonArrayTests
 {
     [Fact]
@@ -33,12 +33,12 @@ public class JsonArrayTests
     [Fact]
     public void ConstructWithEnumerables()
     {
-        JsonArray array = new(new JsonElement?[] 
+        JsonArray array = new(new JsonElement?[]
         {
             1,
             "a",
-            true, 
-            null, 
+            true,
+            null,
             new JsonElement?[]
             {
                 2,
@@ -60,11 +60,11 @@ public class JsonArrayTests
     [Fact]
     public void CastFromEnumerables()
     {
-        JsonArray array = new JsonElement?[] 
+        JsonArray array = new JsonElement?[]
         {
-            1, 
-            "a", 
-            true, 
+            1,
+            "a",
+            true,
             null,
             new JsonElement?[]
             {

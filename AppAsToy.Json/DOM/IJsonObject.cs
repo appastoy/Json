@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace AppAsToy.Json.DOM;
-public interface IJsonObject : IJsonElement, IReadOnlyDictionary<string, JsonElement>
+public interface IJsonObject : IJsonElement, IReadOnlyDictionary<string, IJsonElement>
 {
-    IReadOnlyList<JsonProperty> Properties { get; }
-
-    void Add(string key, JsonElement value);
-    bool Remove(string key);
+    new ArrayEnumerator<JsonProperty> GetEnumerator();
     string ToString();
 }
