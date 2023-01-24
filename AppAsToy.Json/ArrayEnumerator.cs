@@ -9,12 +9,14 @@ namespace AppAsToy.Json
     public struct ArrayEnumerator<T> : IEnumerator<T>
     {
         private readonly IReadOnlyList<T> _array;
+        private readonly int _count;
         private int _index;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ArrayEnumerator(IReadOnlyList<T> array)
+        internal ArrayEnumerator(IReadOnlyList<T> array, int count)
         {
             _array = array;
+            _count = count;
             _index = -1;
         }
 
@@ -31,7 +33,7 @@ namespace AppAsToy.Json
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext() => ++_index < _array.Count;
+        public bool MoveNext() => ++_index < _count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Reset() => _index = -1;
