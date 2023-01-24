@@ -2,29 +2,17 @@
 
 namespace AppAsToy.Json.DOM
 {
-    public sealed class JsonDateTimeOffset : JsonElement
+    public sealed class JsonDateTimeOffset : JsonValue<DateTimeOffset>
     {
-        public static JsonDateTimeOffset Now => new JsonDateTimeOffset(DateTimeOffset.Now);
-        public static JsonDateTimeOffset UtcNow => new JsonDateTimeOffset(DateTimeOffset.UtcNow);
-
-        public readonly DateTimeOffset RawValue;
+        public static JsonDateTimeOffset Now => new(DateTimeOffset.Now);
+        public static JsonDateTimeOffset UtcNow => new(DateTimeOffset.UtcNow);
 
         public override JsonElementType Type => JsonElementType.DateTimeOffset;
         public override DateTimeOffset? asDateTimeOffset => RawValue;
         public override DateTimeOffset toDateTimeOffset => RawValue;
 
-        public JsonDateTimeOffset(DateTimeOffset dateTime)
-        {
-            RawValue = dateTime;
-        }
-
+        public JsonDateTimeOffset(DateTimeOffset dateTime) : base(dateTime) { }
         public override string ToString(bool _) => $"\"{RawValue.ToString("yyyy-MM-ddTHH:mm:ssK")}\"";
-
-        protected override bool IsEqual(JsonElement? element)
-            => element is JsonDateTimeOffset dto && dto.RawValue == RawValue;
-
         public override bool Equals(DateTimeOffset other) => other == RawValue;
-
-        public override int GetHashCode() => RawValue.GetHashCode();
     }
 }

@@ -2,13 +2,11 @@
 
 namespace AppAsToy.Json.DOM
 {
-    public sealed class JsonNumber : JsonElement
+    public sealed class JsonNumber : JsonValue<double>
     {
         public static JsonNumber Zero { get; } = new JsonNumber(0.0d);
         public static JsonNumber MinValue { get; } = new JsonNumber(double.MinValue);
         public static JsonNumber MaxValue { get; } = new JsonNumber(double.MaxValue);
-
-        public readonly double RawValue;
 
         public override JsonElementType Type => JsonElementType.Number;
 
@@ -36,39 +34,31 @@ namespace AppAsToy.Json.DOM
         public override ulong toULong { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (ulong)RawValue; }
         public override decimal toDecimal { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (decimal)RawValue; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(double value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(float value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(sbyte value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(short value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(int value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(long value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(byte value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(ushort value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(uint value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(ulong value) => RawValue = value;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(decimal value) => RawValue = (double)value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(double value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(float value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(sbyte value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(short value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(int value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(long value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(byte value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(ushort value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(uint value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(ulong value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(decimal value) : base((double)value) { }
 
         public override string ToString(bool _) => RawValue.ToString();
         public string ToString(string format) => RawValue.ToString(format);
 
-        protected override bool IsEqual(JsonElement? element)
-            => element is JsonNumber jsonNumber && jsonNumber.RawValue == RawValue;
-
-        public override bool Equals(float other) => asFloat == other;
-        public override bool Equals(double other) => asDouble == other;
-        public override bool Equals(decimal other) => asDecimal == other;
-        public override bool Equals(sbyte other) => asSByte == other;
-        public override bool Equals(short other) => asShort == other;
-        public override bool Equals(int other) => asInt == other;
-        public override bool Equals(long other) => asLong == other;
-        public override bool Equals(byte other) => asByte == other;
-        public override bool Equals(ushort other) => asUShort == other;
-        public override bool Equals(uint other) => asUInt == other;
-        public override bool Equals(ulong other) => asULong == other;
-
-        public override int GetHashCode()
-        {
-            return RawValue.GetHashCode();
-        }
+        public override bool Equals(float other) => toFloat == other;
+        public override bool Equals(double other) => RawValue == other;
+        public override bool Equals(decimal other) => toDecimal == other;
+        public override bool Equals(sbyte other) => toSByte == other;
+        public override bool Equals(short other) => toShort == other;
+        public override bool Equals(int other) => toInt == other;
+        public override bool Equals(long other) => toLong == other;
+        public override bool Equals(byte other) => toByte == other;
+        public override bool Equals(ushort other) => toUShort == other;
+        public override bool Equals(uint other) => toUInt == other;
+        public override bool Equals(ulong other) => toULong == other;
     }
 }

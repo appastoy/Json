@@ -10,7 +10,7 @@
 
         public override string ToString(bool _) => "null";
 
-        protected override bool IsEqual(JsonElement? element) => ReferenceEquals(element, null) || element is JsonNull;
+        protected override bool IsEqual(JsonElement? element) => element is null || element is JsonNull;
         public override bool Equals(string other) => other == null;
         public override bool Equals(byte[] other) => other == null;
         public override int GetHashCode()

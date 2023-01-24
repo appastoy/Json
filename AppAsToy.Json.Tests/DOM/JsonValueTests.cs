@@ -114,7 +114,7 @@ public class JsonValueTests
     }
 
     [Fact]
-    public void DateTime_()
+    public void String_DateTime()
     {
         JsonDateTime.Now.isDateTime.Should().BeTrue();
         JsonDateTime.Now.asDateTime.HasValue.Should().BeTrue();
@@ -132,7 +132,7 @@ public class JsonValueTests
     }
 
     [Fact]
-    public void DateTimeOffset_()
+    public void String_DateTimeOffset()
     {
         JsonDateTimeOffset.Now.isDateTimeOffset.Should().BeTrue();
         JsonDateTimeOffset.Now.asDateTimeOffset.HasValue.Should().BeTrue();
@@ -148,5 +148,56 @@ public class JsonValueTests
         ((object)(JsonElement)new DateTimeOffset(1, 2, 3, 4, 5, 6, TimeSpan.FromHours(9))).Should().Be(new DateTimeOffset(1, 2, 3, 4, 5, 6, TimeSpan.FromHours(9)));
         Regex.IsMatch(JsonDateTimeOffset.Now.ToString(), @"""\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}""").Should().BeTrue();
         Regex.IsMatch(JsonDateTimeOffset.UtcNow.ToString(), @"""\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}""").Should().BeTrue();
+    }
+
+    [Fact]
+    public void String_TimeSpan()
+    {
+        JsonTimeSpan.Zero.isTimeSpan.Should().BeTrue();
+        JsonTimeSpan.Zero.asTimeSpan.HasValue.Should().BeTrue();
+        new Func<TimeSpan>(() => JsonTimeSpan.Zero.toTimeSpan).Should().NotThrow();
+
+        var randomSpan = TimeSpan.FromTicks(new Random().Next());
+        var randomJson = new JsonTimeSpan(randomSpan);
+        randomJson.Equals(randomSpan).Should().BeTrue();
+        (randomJson == randomSpan).Should().BeTrue();
+        (randomJson != randomSpan).Should().BeFalse();
+        randomJson.RawValue.Should().Be(randomSpan);
+        ((object)(JsonElement)randomJson).Should().Be(randomSpan);
+        Regex.IsMatch(randomJson.ToString(), @"""\d+\.\d{2}:\d{2}:\d{2}""").Should().BeTrue();
+    }
+
+    [Fact]
+    public void String_Guid()
+    {
+        JsonGuid.New.isGuid.Should().BeTrue();
+        JsonGuid.New.asGuid.HasValue.Should().BeTrue();
+        new Func<Guid>(() => JsonGuid.New.toGuid).Should().NotThrow();
+
+        var randomGuid = Guid.NewGuid();
+        var randomJson = new JsonGuid(randomGuid);
+        randomJson.Equals(randomGuid).Should().BeTrue();
+        (randomJson == randomGuid).Should().BeTrue();
+        (randomJson != randomGuid).Should().BeFalse();
+        randomJson.RawValue.Should().Be(randomGuid);
+        ((object)(JsonElement)randomJson).Should().Be(randomGuid);
+        Regex.IsMatch(randomJson.ToString(), @"""[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}""").Should().BeTrue();
+    }
+
+    [Fact]
+    public void String_ByteArray()
+    {
+        JsonByteArray.Empty.isByteArray.Should().BeTrue();
+        JsonByteArray.Empty.asByteArray.Should().BeEmpty();
+        new Func<byte[]>(() => JsonByteArray.Empty.toByteArray).Should().NotThrow();
+
+        var byteArray = new byte[] { 1, 2, 3, 4 };
+        var byteArrayJson = new JsonByteArray(byteArray);
+        byteArrayJson.Equals(byteArrayJson).Should().BeTrue();
+        (byteArrayJson == byteArray).Should().BeTrue();
+        (byteArrayJson != byteArray).Should().BeFalse();
+        byteArrayJson.RawValue.Should().BeEquivalentTo(byteArray);
+        ((object)(JsonElement)byteArrayJson).Should().Be(byteArray);
+        Regex.IsMatch(byteArrayJson.ToString(), $@"""{Convert.ToBase64String(byteArray)}""").Should().BeTrue();
     }
 }
