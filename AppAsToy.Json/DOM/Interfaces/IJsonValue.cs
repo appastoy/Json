@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace AppAsToy.Json.DOM;
-public interface IJsonElement :
-    IReadOnlyList<IJsonElement>,
-    IReadOnlyDictionary<string, IJsonElement>,
-    IEquatable<IJsonElement>,
-    IEquatable<string>,
-    IEquatable<bool>,
+public interface IJsonValue :
     IEquatable<float>,
     IEquatable<double>,
     IEquatable<decimal>,
@@ -18,11 +12,15 @@ public interface IJsonElement :
     IEquatable<byte>,
     IEquatable<ushort>,
     IEquatable<uint>,
-    IEquatable<ulong>
+    IEquatable<ulong>,
+    IEquatable<bool>,
+    IEquatable<string>,
+    IEquatable<DateTime>,
+    IEquatable<DateTimeOffset>,
+    IEquatable<TimeSpan>,
+    IEquatable<Guid>,
+    IEquatable<byte[]>
 {
-    JsonElementType Type { get; }
-    IJsonArray? asArray { get; }
-    IJsonObject? asObject { get; }
     double? asDouble { get; }
     float? asFloat { get; }
     sbyte? asSByte { get; }
@@ -36,9 +34,12 @@ public interface IJsonElement :
     decimal? asDecimal { get; }
     string? asString { get; }
     bool? asBool { get; }
+    DateTime? asDateTime { get; }
+    DateTimeOffset? asDateTimeOffset { get; }
+    TimeSpan? asTimeSpan { get; }
+    Guid? asGuid { get; }
+    byte[]? asByteArray { get; }
 
-    IJsonArray toArray { get; }
-    IJsonObject toObject { get; }
     double toDouble { get; }
     float toFloat { get; }
     sbyte toSByte { get; }
@@ -52,13 +53,9 @@ public interface IJsonElement :
     decimal toDecimal { get; }
     string toString { get; }
     bool toBool { get; }
-
-    bool IsNull => Type == JsonElementType.Null;
-    bool IsBool => Type == JsonElementType.Bool;
-    bool IsString => Type == JsonElementType.String;
-    bool IsNumber => Type == JsonElementType.Number;
-    bool IsArray => Type == JsonElementType.Array;
-    bool IsObject => Type == JsonElementType.Object;
-
-    string ToString(bool writeIndented);
+    DateTime toDateTime { get; }
+    DateTimeOffset toDateTimeOffset { get; }
+    TimeSpan toTimeSpan { get; }
+    Guid toGuid { get; }
+    byte[] toByteArray { get; }
 }

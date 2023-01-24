@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 #pragma warning disable CS0659
@@ -10,21 +9,114 @@ using System.Runtime.CompilerServices;
 
 namespace AppAsToy.Json.DOM
 {
-    public abstract class JsonElement : 
-        IJsonElement, 
-        IEquatable<JsonElement>, 
-        IList<JsonElement>, 
-        IDictionary<string, JsonElement>
+    public abstract class JsonElement : IJsonElement
     {
-        public static JsonElement Null { get; } = JsonNull.Instance;
+        public static JsonElement Null { get; } = JsonNull.Shared;
 
-        public virtual string ToString(bool writeIndented) => string.Empty;
-
-        #region IJsonElement Implements
+        #region Common Interfaces
 
         public abstract JsonElementType Type { get; }
-        public virtual JsonArray? asArray => null;
-        public virtual JsonObject? asObject => null;
+        
+        public bool isNull => Type == JsonElementType.Null;
+        public bool isBool => Type == JsonElementType.Bool;
+        public bool isString => Type == JsonElementType.String;
+        public bool isNumber => Type == JsonElementType.Number;
+        public bool isDateTime => Type == JsonElementType.DateTime;
+        public bool isDateTimeOffset => Type == JsonElementType.DateTimeOffset;
+        public bool isTimeSpan => Type == JsonElementType.TimeSpan;
+        public bool isGuid => Type == JsonElementType.Guid;
+        public bool isByteArray => Type == JsonElementType.ByteArray;
+        public bool isArray => Type == JsonElementType.Array;
+        public bool isObject => Type == JsonElementType.Object;
+        public bool isProperty => Type == JsonElementType.Property;
+        public abstract string ToString(bool writeIndented);
+        public override string ToString() => ToString(true);
+
+        #endregion Common Interfaces
+
+        #region Collection Interfaces
+
+        public virtual void Clear() => throw new NotImplementedException();
+        public virtual ArrayEnumerator<JsonElement> GetEnumerator() => new(Array.Empty<JsonElement>(), 0);
+        protected virtual ArrayEnumerator<IJsonElement> GetReadOnlyEnumerator() => new(Array.Empty<IJsonElement>(), 0);
+        protected virtual IEnumerator<IJsonElement> GetDefaultEnumerator() => ((IEnumerable<IJsonElement>)Array.Empty<IJsonElement>()).GetEnumerator();
+        protected virtual IEnumerator GetBaseEnumerator() => Array.Empty<IJsonElement>().GetEnumerator();
+        ArrayEnumerator<IJsonElement> IJsonCollection.GetEnumerator() => GetReadOnlyEnumerator();
+        IEnumerator<IJsonElement> IEnumerable<IJsonElement>.GetEnumerator() => GetDefaultEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetBaseEnumerator();
+
+
+        #endregion Collection Interfaces
+
+        #region Array Interfaces
+
+        public virtual int Count => 0;
+        public virtual JsonElement this[int index]
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public virtual bool Contains(IJsonElement? item) => throw new NotImplementedException();
+        public virtual int IndexOf(IJsonElement? element) => throw new NotImplementedException();
+        public virtual int LastIndexOf(IJsonElement? element) => throw new NotImplementedException();
+        public virtual int FindIndex(Predicate<IJsonElement> func) => throw new NotImplementedException();
+        public virtual int FindLastIndex(Predicate<IJsonElement> func) => throw new NotImplementedException();
+        public virtual JsonElement Find(Predicate<IJsonElement> func) => throw new NotImplementedException();
+        public virtual JsonElement FindLast(Predicate<IJsonElement> func) => throw new NotImplementedException();
+        IJsonElement IReadOnlyList<IJsonElement>.this[int index] => this[index];
+        IJsonElement IJsonArray.FindFirst(Predicate<IJsonElement> func) => Find(func);
+        IJsonElement IJsonArray.FindLast(Predicate<IJsonElement> func) => FindLast(func);
+
+        public virtual void Add(JsonElement element) => throw new NotImplementedException();
+        public virtual void AddRange(IEnumerable<JsonElement> element) => throw new NotImplementedException();
+        public virtual void Insert(int index, JsonElement element) => throw new NotImplementedException();
+        public virtual bool Remove(JsonElement element) => throw new NotImplementedException();
+        public virtual void RemoveAt(int index) => throw new NotImplementedException();
+        public virtual void RemoveRange(int index, int count) => throw new NotImplementedException();
+        public virtual int RemoveAll(Predicate<IJsonElement> func) => throw new NotImplementedException();
+
+        #endregion Array Interfaces
+
+        #region Object Interfaces
+
+        public virtual JsonElement this[string key]
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public virtual string Key => throw new NotImplementedException();
+        public virtual JsonElement Value
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public virtual IEnumerable<string> Keys => Array.Empty<string>();
+        public virtual IEnumerable<JsonElement> Values => Array.Empty<JsonElement>();
+        public virtual bool ContainsKey(string key) => throw new NotImplementedException();
+        public virtual bool TryGetValue(string key, out JsonElement value) => throw new NotImplementedException();
+        IJsonElement IJsonObject.this[string key] => this[key];
+        IJsonElement IJsonProperty.Value => Value;
+        IEnumerable<IJsonElement> IJsonObject.Values => Values;
+        bool IJsonObject.TryGetValue(string key, out IJsonElement value)
+        {
+            if (TryGetValue(key, out var typedValue))
+            {
+                value = typedValue;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public virtual bool TryAdd(string key, JsonElement value) => throw new NotImplementedException();
+        public virtual void Add(string key, JsonElement value) => throw new NotImplementedException();
+        public virtual bool Remove(string key) => throw new NotImplementedException();
+
+        #endregion Object Interfaces
+
+        #region Casting Interfaces
+
         public virtual double? asDouble => null;
         public virtual float? asFloat => null;
         public virtual sbyte? asSByte => null;
@@ -38,9 +130,12 @@ namespace AppAsToy.Json.DOM
         public virtual decimal? asDecimal => null;
         public virtual string? asString => null;
         public virtual bool? asBool => null;
+        public virtual DateTime? asDateTime => null;
+        public virtual DateTimeOffset? asDateTimeOffset => null;
+        public virtual TimeSpan? asTimeSpan => null;
+        public virtual Guid? asGuid => null;
+        public virtual byte[]? asByteArray => null;
 
-        public virtual JsonArray toArray => throw new NotImplementedException();
-        public virtual JsonObject toObject => throw new NotImplementedException();
         public virtual double toDouble => throw new NotImplementedException();
         public virtual float toFloat => throw new NotImplementedException();
         public virtual sbyte toSByte => throw new NotImplementedException();
@@ -54,119 +149,66 @@ namespace AppAsToy.Json.DOM
         public virtual decimal toDecimal => throw new NotImplementedException();
         public virtual string toString => throw new NotImplementedException();
         public virtual bool toBool => throw new NotImplementedException();
+        public virtual DateTime toDateTime => throw new NotImplementedException();
+        public virtual DateTimeOffset toDateTimeOffset => throw new NotImplementedException();
+        public virtual TimeSpan toTimeSpan => throw new NotImplementedException();
+        public virtual Guid toGuid => throw new NotImplementedException();
+        public virtual byte[] toByteArray => throw new NotImplementedException();
 
-        IJsonArray? IJsonElement.asArray => asArray;
-        IJsonObject? IJsonElement.asObject => asObject;
-        IJsonArray IJsonElement.toArray => toArray;
-        IJsonObject IJsonElement.toObject => toObject;
+        #endregion Casting Interfaces
 
-        IEnumerable<string> IReadOnlyDictionary<string, IJsonElement>.Keys => Keys;
-        IEnumerable<IJsonElement> IReadOnlyDictionary<string, IJsonElement>.Values => Values;
-        IJsonElement IReadOnlyDictionary<string, IJsonElement>.this[string key] => this[key];
-        IJsonElement IReadOnlyList<IJsonElement>.this[int index] => this[index];
-        bool IReadOnlyDictionary<string, IJsonElement>.ContainsKey(string key) => ContainsKey(key);
-        bool IReadOnlyDictionary<string, IJsonElement>.TryGetValue(string key, out IJsonElement value)
-        {
-            if (TryGetValue(key, out var _value))
-            {
-                value = _value;
-                return true;
-            }
-            value = default;
-            return false;
-        }
+        #region IEquatable Interfaces
 
-        IEnumerator<IJsonElement> IEnumerable<IJsonElement>.GetEnumerator() => GetReferenceEnumerator();
-
-        IEnumerator<KeyValuePair<string, IJsonElement>> IEnumerable<KeyValuePair<string, IJsonElement>>.GetEnumerator()
-            => GetReadOnlyReferenceKeyValueEnumerator();
-
-        protected virtual IEnumerator<KeyValuePair<string, IJsonElement>> GetReadOnlyReferenceKeyValueEnumerator()
-            => Enumerable.Empty<KeyValuePair<string, IJsonElement>>().GetEnumerator();
-
-        bool IEquatable<IJsonElement>.Equals(IJsonElement other) => Equals(other);
-        public virtual bool Equals(string? other) => false;
-        public virtual bool Equals(bool other) => false;
-        public virtual bool Equals(float other) => false;
-        public virtual bool Equals(double other) => false;
-        public virtual bool Equals(decimal other) => false;
-        public virtual bool Equals(sbyte other) => false;
-        public virtual bool Equals(short other) => false;
-        public virtual bool Equals(int other) => false;
-        public virtual bool Equals(long other) => false;
-        public virtual bool Equals(byte other) => false;
-        public virtual bool Equals(ushort other) => false;
-        public virtual bool Equals(uint other) => false;
-        public virtual bool Equals(ulong other) => false;
-
-        #endregion IJsonElement Implements
-
-        #region IEquatable<JsonElement> Implements
+        bool IEquatable<IJsonElement>.Equals(IJsonElement other) => Equals(other as JsonElement);
+        public virtual bool Equals(string   other) => false;
+        public virtual bool Equals(bool     other) => false;
+        public virtual bool Equals(float    other) => false;
+        public virtual bool Equals(double   other) => false;
+        public virtual bool Equals(decimal  other) => false;
+        public virtual bool Equals(sbyte    other) => false;
+        public virtual bool Equals(short    other) => false;
+        public virtual bool Equals(int      other) => false;
+        public virtual bool Equals(long     other) => false;
+        public virtual bool Equals(byte     other) => false;
+        public virtual bool Equals(ushort   other) => false;
+        public virtual bool Equals(uint     other) => false;
+        public virtual bool Equals(ulong    other) => false;
+        public virtual bool Equals(DateTime other) => false;
+        public virtual bool Equals(DateTimeOffset other) => false;
+        public virtual bool Equals(TimeSpan other) => false;
+        public virtual bool Equals(Guid other) => false;
+        public virtual bool Equals(byte[] other) => false;
 
         public bool Equals(JsonElement? other) => IsEqual(other);
         protected abstract bool IsEqual(JsonElement? element);
-        public override bool Equals(object other) =>
-            (other == null && Type == JsonElementType.Null) ||
-            (other is JsonElement element && Equals(element));
-
-
-
-        #endregion IEquatable<JsonElement>
-
-        #region IList<JsonElement> Implements
-
-        public virtual int Count => 0;
-        public bool IsReadOnly => false;
-        public virtual JsonElement this[int index]
+        public override bool Equals(object other)
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            if (other == null)
+                return Type == JsonElementType.Null;
+
+            return (other is JsonElement element && IsEqual(element)) ||
+                (other is string  _string  && Equals(_string )) ||
+                (other is bool    _bool    && Equals(_bool   )) ||
+                (other is float   _float   && Equals(_float  )) ||
+                (other is double  _double  && Equals(_double )) ||
+                (other is decimal _decimal && Equals(_decimal)) ||
+                (other is sbyte   _sbyte   && Equals(_sbyte  )) ||
+                (other is short   _short   && Equals(_short  )) ||
+                (other is int     _int     && Equals(_int    )) ||
+                (other is long    _long    && Equals(_long   )) ||
+                (other is byte    _byte    && Equals(_byte   )) ||
+                (other is ushort  _ushort  && Equals(_ushort )) ||
+                (other is uint    _uint    && Equals(_uint   )) ||
+                (other is ulong   _ulong   && Equals(_ulong  )) ||
+                (other is DateTime       _dateTime && Equals(_dateTime)) ||
+                (other is DateTimeOffset _dateTimeOffset && Equals(_dateTimeOffset)) ||
+                (other is TimeSpan       _timeSpan && Equals(_timeSpan)) ||
+                (other is Guid           _guid && Equals(_guid)) ||
+                (other is byte[]         _byteArray && Equals(_byteArray));
         }
-        public virtual int IndexOf(JsonElement item) => throw new NotImplementedException();
-        public virtual void Insert(int index, JsonElement item) => throw new NotImplementedException();
-        public virtual void RemoveAt(int index) => throw new NotImplementedException();
-        public virtual void Add(JsonElement item) => throw new NotImplementedException();
-        public virtual void Clear() => throw new NotImplementedException();
-        public virtual bool Contains(JsonElement item) => throw new NotImplementedException();
-        public virtual void CopyTo(JsonElement[] array, int arrayIndex) => throw new NotImplementedException();
-        public virtual bool Remove(JsonElement item) => throw new NotImplementedException();
+            
 
-        protected virtual IEnumerator<JsonElement> GetReferenceEnumerator() => Enumerable.Empty<JsonElement>().GetEnumerator();
-        protected virtual IEnumerator GetBaseEnumerator() => Enumerable.Empty<JsonElement>().GetEnumerator();
-        IEnumerator<JsonElement> IEnumerable<JsonElement>.GetEnumerator() => GetReferenceEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetBaseEnumerator();
-
-        #endregion IList<JsonElement> Implements
-
-        #region IDictionary<JsonElement> Implements
-
-        public virtual ICollection<string> Keys => System.Array.Empty<string>();
-        public virtual ICollection<JsonElement> Values => System.Array.Empty<JsonElement>();
-        public virtual JsonElement this[string key]
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
-        public virtual bool ContainsKey(string key) => false;
-        public virtual bool TryGetValue(string key, out JsonElement value) { value = default; return false; }
-        public virtual void Add(string key, JsonElement value) => throw new NotImplementedException();
-        public virtual bool Remove(string key) => throw new NotImplementedException();
-        protected virtual void Add(KeyValuePair<string, JsonElement> item) => throw new NotImplementedException();
-        protected virtual bool Contains(KeyValuePair<string, JsonElement> item) => throw new NotImplementedException();
-        protected virtual void CopyTo(KeyValuePair<string, JsonElement>[] array, int arrayIndex) => throw new NotImplementedException();
-        protected virtual bool Remove(KeyValuePair<string, JsonElement> item) => throw new NotImplementedException();
-
-        void ICollection<KeyValuePair<string, JsonElement>>.Add(KeyValuePair<string, JsonElement> item) => Add(item);
-        bool ICollection<KeyValuePair<string, JsonElement>>.Contains(KeyValuePair<string, JsonElement> item) => Contains(item);
-        void ICollection<KeyValuePair<string, JsonElement>>.CopyTo(KeyValuePair<string, JsonElement>[] array, int arrayIndex) => CopyTo(array, arrayIndex);
-        bool ICollection<KeyValuePair<string, JsonElement>>.Remove(KeyValuePair<string, JsonElement> item) => Remove(item);
-
-        IEnumerator<KeyValuePair<string, JsonElement>> IEnumerable<KeyValuePair<string, JsonElement>>.GetEnumerator()
-            => GetReferenceKeyValueEnumerator();
-        protected virtual IEnumerator<KeyValuePair<string, JsonElement>> GetReferenceKeyValueEnumerator()
-            => Enumerable.Empty<KeyValuePair<string, JsonElement>>().GetEnumerator();
-
-        #endregion IDictionary<JsonElement> Implements
+        #endregion IEquatable Interfaces
 
         #region Casting Operators
 
@@ -183,6 +225,11 @@ namespace AppAsToy.Json.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(uint value) => new JsonNumber(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(ulong value) => new JsonNumber(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(decimal value) => new JsonNumber(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(DateTime value) => new JsonDateTime(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(DateTimeOffset value) => new JsonDateTimeOffset(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(TimeSpan value) => new JsonTimeSpan(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(Guid value) => new JsonGuid(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(byte[] value) => new JsonByteArray(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator JsonElement(JsonElement?[] value)
         {
@@ -204,7 +251,6 @@ namespace AppAsToy.Json.DOM
         #endregion Casting Operators
 
         #region Equality Operators
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, JsonElement? right) => Equals(left, right);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, float right) => left?.Equals(right) ?? false;
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, double right) => left?.Equals(right) ?? false;
@@ -217,6 +263,11 @@ namespace AppAsToy.Json.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, ushort right) => left?.Equals(right) ?? false;
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, uint right) => left?.Equals(right) ?? false;
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, ulong right) => left?.Equals(right) ?? false;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, DateTime right) => left?.Equals(right) ?? false;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, DateTimeOffset right) => left?.Equals(right) ?? false;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, TimeSpan right) => left?.Equals(right) ?? false;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, Guid right) => left?.Equals(right) ?? false;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator ==(JsonElement? left, byte[] right) => left?.Equals(right) ?? false;
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, JsonElement? right) => !Equals(left, right);
@@ -231,11 +282,16 @@ namespace AppAsToy.Json.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, ushort right) => !(left?.Equals(right) ?? false);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, uint right) => !(left?.Equals(right) ?? false);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, ulong right) => !(left?.Equals(right) ?? false);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, DateTime right) => !(left?.Equals(right) ?? false);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, DateTimeOffset right) => !(left?.Equals(right) ?? false);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, TimeSpan right) => !(left?.Equals(right) ?? false);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, Guid right) => !(left?.Equals(right) ?? false);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static bool operator !=(JsonElement? left, byte[] right) => !(left?.Equals(right) ?? false);
 
         private static bool Equals(JsonElement? left, JsonElement? right)
         {
-            var leftNull = ReferenceEquals(left, null) || left is JsonNull;
-            var rightNull = ReferenceEquals(right, null) || right is JsonNull;
+            var leftNull = left is null || left is JsonNull;
+            var rightNull = right is null || right is JsonNull;
 
             if (leftNull != rightNull)
                 return false;

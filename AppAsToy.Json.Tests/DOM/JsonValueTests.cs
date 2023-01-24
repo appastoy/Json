@@ -1,5 +1,5 @@
 using AppAsToy.Json.DOM;
-
+using System.Text.RegularExpressions;
 
 namespace AppAsToy.Json.Tests.DOM;
 
@@ -11,7 +11,7 @@ public class JsonValueTests
         JsonElement.Null.Should().NotBeNull();
         JsonElement.Null.Should().BeAssignableTo<JsonElement>();
 
-        JsonElement.Null.Equals(null).Should().BeTrue();
+        JsonElement.Null.isNull.Should().BeTrue();
         (JsonElement.Null == null).Should().BeTrue();
         (JsonElement.Null != null).Should().BeFalse();
     }
@@ -32,17 +32,17 @@ public class JsonValueTests
         var number10 = new JsonNumber(ulong.MaxValue >> 12); number10.asULong.Should().Be(ulong.MaxValue >> 12);
         var number11 = new JsonNumber(1234m); number11.asDecimal.Should().Be(1234m);
 
-        ((IJsonElement)(JsonElement)0.1d).Should().Be(number1);
-        ((IJsonElement)(JsonElement)0.1f).Should().Be(number2);
-        ((IJsonElement)(JsonElement)sbyte.MaxValue).Should().Be(number3);
-        ((IJsonElement)(JsonElement)short.MaxValue).Should().Be(number4);
-        ((IJsonElement)(JsonElement)int.MaxValue).Should().Be(number5);
-        ((IJsonElement)(JsonElement)(long.MaxValue >> 12)).Should().Be(number6);
-        ((IJsonElement)(JsonElement)byte.MaxValue).Should().Be(number7);
-        ((IJsonElement)(JsonElement)ushort.MaxValue).Should().Be(number8);
-        ((IJsonElement)(JsonElement)uint.MaxValue).Should().Be(number9);
-        ((IJsonElement)(JsonElement)(ulong.MaxValue >> 12)).Should().Be(number10);
-        ((IJsonElement)(JsonElement)1234m).Should().Be(number11);
+        ((object)(JsonElement)0.1d).Should().Be(number1);
+        ((object)(JsonElement)0.1f).Should().Be(number2);
+        ((object)(JsonElement)sbyte.MaxValue).Should().Be(number3);
+        ((object)(JsonElement)short.MaxValue).Should().Be(number4);
+        ((object)(JsonElement)int.MaxValue).Should().Be(number5);
+        ((object)(JsonElement)(long.MaxValue >> 12)).Should().Be(number6);
+        ((object)(JsonElement)byte.MaxValue).Should().Be(number7);
+        ((object)(JsonElement)ushort.MaxValue).Should().Be(number8);
+        ((object)(JsonElement)uint.MaxValue).Should().Be(number9);
+        ((object)(JsonElement)(ulong.MaxValue >> 12)).Should().Be(number10);
+        ((object)(JsonElement)1234m).Should().Be(number11);
 
         number1.Equals(0.1d).Should().BeTrue();
         number2.Equals(0.1f).Should().BeTrue();
@@ -84,14 +84,14 @@ public class JsonValueTests
     [Fact]
     public void String()
     {
-        JsonString.Empty.Value.Should().BeEmpty();
-        var str1 = new JsonString("abc"); str1.Value.Should().Be("abc");
-        new JsonString("가나다").Value.Should().Be("가나다");
+        JsonString.Empty.RawValue.Should().BeEmpty();
+        var str1 = new JsonString("abc"); str1.RawValue.Should().Be("abc");
+        new JsonString("가나다").RawValue.Should().Be("가나다");
 #pragma warning disable CS8625
         new Action(() => new JsonString(null)).Should().Throw<ArgumentNullException>();
 #pragma warning restore CS8625
 
-        ((IJsonElement)(JsonElement)"abc").Should().Be(str1);
+        ((object)(JsonElement)"abc").Should().Be(str1);
 
         str1.Equals("abc").Should().BeTrue();
         (str1 == "abc").Should().BeTrue();
@@ -101,14 +101,52 @@ public class JsonValueTests
     [Fact]
     public void Bool()
     {
-        JsonBool.True.Value.Should().BeTrue();
-        JsonBool.False.Value.Should().BeFalse();
+        JsonBool.True.RawValue.Should().BeTrue();
+        JsonBool.False.RawValue.Should().BeFalse();
 
-        ((IJsonElement)(JsonElement)true).Should().Be(JsonBool.True);
-        ((IJsonElement)(JsonElement)false).Should().Be(JsonBool.False);
+        ((object)(JsonElement)true).Should().Be(JsonBool.True);
+        ((object)(JsonElement)false).Should().Be(JsonBool.False);
 
         JsonBool.True.Equals(true).Should().BeTrue();
+        JsonBool.False.Equals(false).Should().BeTrue();
         (JsonBool.True == true).Should().BeTrue();
         (JsonBool.True != true).Should().BeFalse();
+    }
+
+    [Fact]
+    public void DateTime_()
+    {
+        JsonDateTime.Now.isDateTime.Should().BeTrue();
+        JsonDateTime.Now.asDateTime.HasValue.Should().BeTrue();
+        new Func<DateTime>(() => JsonDateTime.Now.toDateTime).Should().NotThrow();
+
+        var now = DateTime.Now;
+        var nowJson = new JsonDateTime(now);
+        nowJson.Equals(now).Should().BeTrue();
+        (nowJson == now).Should().BeTrue();
+        (nowJson != now).Should().BeFalse();
+        JsonDateTime.Now.RawValue.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1));
+        JsonDateTime.UtcNow.RawValue.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        ((object)(JsonElement)new DateTime(1,2,3,4,5,6)).Should().Be(new DateTime(1,2,3,4,5,6));
+        Regex.IsMatch(JsonDateTime.Now.ToString(), @"""\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}""").Should().BeTrue();
+    }
+
+    [Fact]
+    public void DateTimeOffset_()
+    {
+        JsonDateTimeOffset.Now.isDateTimeOffset.Should().BeTrue();
+        JsonDateTimeOffset.Now.asDateTimeOffset.HasValue.Should().BeTrue();
+        new Func<DateTimeOffset>(() => JsonDateTimeOffset.Now.toDateTimeOffset).Should().NotThrow();
+
+        var now = DateTimeOffset.Now;
+        var nowJson = new JsonDateTimeOffset(now);
+        nowJson.Equals(now).Should().BeTrue();
+        (nowJson == now).Should().BeTrue();
+        (nowJson != now).Should().BeFalse();
+        JsonDateTimeOffset.Now.RawValue.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromSeconds(1));
+        JsonDateTimeOffset.UtcNow.RawValue.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(1));
+        ((object)(JsonElement)new DateTimeOffset(1, 2, 3, 4, 5, 6, TimeSpan.FromHours(9))).Should().Be(new DateTimeOffset(1, 2, 3, 4, 5, 6, TimeSpan.FromHours(9)));
+        Regex.IsMatch(JsonDateTimeOffset.Now.ToString(), @"""\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}""").Should().BeTrue();
+        Regex.IsMatch(JsonDateTimeOffset.UtcNow.ToString(), @"""\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}""").Should().BeTrue();
     }
 }

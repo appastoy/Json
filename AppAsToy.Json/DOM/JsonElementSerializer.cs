@@ -87,7 +87,7 @@ namespace AppAsToy.Json.DOM
 
             if (@object.Count > 0)
             {
-                var properties = @object.Properties;
+                var properties = @object._properties;
                 AppendLine(depth + 1);
                 SerializeProperty(properties[0], depth + 1);
                 for (int i = 1; i < properties.Count; i++)
@@ -103,7 +103,7 @@ namespace AppAsToy.Json.DOM
 
         private void SerializeProperty(JsonProperty property, int depth)
         {
-            _builder.Append(JsonString.ConvertToJson(property.Name));
+            _builder.Append(JsonString.ConvertToJson(property.Key));
             AppendColon();
             SerializeElement(property.Value, depth);
         }

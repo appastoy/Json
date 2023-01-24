@@ -2,43 +2,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 #pragma warning disable CS8764
-#pragma warning disable CS8766
 
 namespace AppAsToy.Json.DOM
 {
-    public sealed class JsonObject : JsonElement, IJsonObject, IDictionary<string, JsonElement>
+    public sealed class JsonObject : JsonElement
     {
         public static IJsonObject Empty { get; } = new JsonObject();
 
-        private List<JsonProperty> _properties;
+        internal List<JsonProperty> _properties;
         private Dictionary<string, JsonElement> _propertyMap;
 
         public override JsonElementType Type => JsonElementType.Object;
 
-        public IReadOnlyList<JsonProperty> Properties => _properties;
-
-        public override JsonElement? this[string name]
+        public override JsonElement? this[string key]
         {
-            get => _propertyMap.TryGetValue(name, out var value) ? value : Null;
+            get => _propertyMap.TryGetValue(key, out var value) ? value : Null;
             set
             {
-                var index = _properties.FindIndex(p => p.Name == name);
+                if (key == null)
+                    throw new ArgumentNullException(nameof(key));
+
+                var index = _properties.FindIndex(p => p.Key == key);
                 if (index < 0)
-                    _properties.Add(new JsonProperty(name, value ?? Null));
+                    _properties.Add(new JsonProperty(key, value ?? Null));
                 else
-                    _properties[index] = new JsonProperty(name, value ?? Null);
-                _propertyMap[name] = value ?? Null;
+                    _properties[index] = new JsonProperty(key, value ?? Null);
+                _propertyMap[key] = value ?? Null;
             }
         }
-
         public override int Count => _properties.Count;
-        public override ICollection<string> Keys => _propertyMap.Keys;
-        public override ICollection<JsonElement> Values => _propertyMap.Values;
-
-        public override JsonObject? asObject => this;
-        public override JsonObject toObject => this;
+        public override IEnumerable<string> Keys => _propertyMap.Keys;
+        public override IEnumerable<JsonElement> Values => _propertyMap.Values;
 
         public JsonObject()
         {
@@ -48,8 +45,8 @@ namespace AppAsToy.Json.DOM
 
         public JsonObject(params JsonProperty[] properties)
         {
-            _properties = properties.Select(p => new JsonProperty(p.Name, p.Value ?? Null)).ToList();
-            _propertyMap = _properties.ToDictionary(p => p.Name, p => p.Value);
+            _properties = properties.Select(p => new JsonProperty(p.Key, p.Value ?? Null)).ToList();
+            _propertyMap = _properties.ToDictionary(p => p.Key, p => p.Value);
         }
 
         public JsonObject(IEnumerable<JsonProperty> properties)
@@ -58,76 +55,41 @@ namespace AppAsToy.Json.DOM
                 throw new ArgumentNullException(nameof(properties));
 
             _properties = properties.ToList();
-            _propertyMap = _properties.ToDictionary(p => p.Name, p => p.Value);
+            _propertyMap = _properties.ToDictionary(p => p.Key, p => p.Value);
         }
 
-        public override bool ContainsKey(string key)
+        public override bool ContainsKey(string key) => _propertyMap.ContainsKey(key);
+        public override bool TryGetValue(string key, out JsonElement value) => _propertyMap.TryGetValue(key, out value);
+        public override bool TryAdd(string key, JsonElement value)
         {
-            return _propertyMap.ContainsKey(key);
+            if (_propertyMap.TryAdd(key, value))
+            {
+                _properties.Add(new JsonProperty(key, value));
+                return true;
+            }
+            return false;
         }
-
-        public override bool TryGetValue(string key, out JsonElement value)
-        {
-            return _propertyMap.TryGetValue(key, out value);
-        }
-
         public override void Add(string key, JsonElement value)
         {
-            if (_propertyMap.ContainsKey(key))
-                throw new ArgumentException($"key({key}) is already exists.");
-
-            _propertyMap.Add(key, value ?? Null);
-            _properties.Add(new JsonProperty(key, value ?? Null));
+            _propertyMap.Add(key, value);
+            _properties.Add(new JsonProperty(key, value));
         }
+
         public override bool Remove(string key)
         {
             if (_propertyMap.Remove(key))
             {
-                _properties.RemoveAll(p => p.Name == key);
-                return true;
-            }
-            return false;
-        }
-        protected override void Add(KeyValuePair<string, JsonElement> item)
-        {
-            Add(item.Key, item.Value);
-        }
-        protected override bool Contains(KeyValuePair<string, JsonElement> item)
-        {
-            return TryGetValue(item.Key, out var foundItem) && item.Value == foundItem;
-        }
-        protected override void CopyTo(KeyValuePair<string, JsonElement>[] array, int arrayIndex)
-        {
-            ((ICollection<KeyValuePair<string, JsonElement>>)_propertyMap).CopyTo(array, arrayIndex);
-        }
-        protected override bool Remove(KeyValuePair<string, JsonElement> item)
-        {
-            if (((ICollection<KeyValuePair<string, JsonElement>>)_propertyMap).Remove(item))
-            {
-                _properties.RemoveAll(p => p.Name == item.Key);
+                _properties.RemoveAt(_properties.FindIndex(item => item.Key == key));
                 return true;
             }
             return false;
         }
 
-        public ArrayEnumerator<JsonProperty> GetEnumerator() => new ArrayEnumerator<JsonProperty>(_properties);
-        
-        protected override IEnumerator<KeyValuePair<string, JsonElement>> GetReferenceKeyValueEnumerator()
+        public override void Clear()
         {
-            return ((IEnumerable<KeyValuePair<string, JsonElement>>)_propertyMap).GetEnumerator();
+            _properties.Clear();
+            _propertyMap.Clear();
         }
-
-        protected override IEnumerator<KeyValuePair<string, IJsonElement>> GetReadOnlyReferenceKeyValueEnumerator()
-        {
-            return _propertyMap.Select(kv => new KeyValuePair<string, IJsonElement>(kv.Key, kv.Value)).GetEnumerator();
-        }
-
-        protected override IEnumerator GetBaseEnumerator()
-        {
-            return ((IEnumerable)_properties).GetEnumerator();
-        }
-
-        public override string ToString() => ToString(true);
 
         public override string ToString(bool writeIndented)
         {
@@ -140,7 +102,24 @@ namespace AppAsToy.Json.DOM
                 @object.Count == _properties.Count &&
                 @object._properties.SequenceEqual(_properties);
         }
+        
+        public override ArrayEnumerator<JsonElement> GetEnumerator() => new(_properties, _properties.Count);
+        protected override ArrayEnumerator<IJsonElement> GetReadOnlyEnumerator() => new(_properties, _properties.Count);
+        protected override IEnumerator<IJsonElement> GetDefaultEnumerator() => ((IEnumerable<JsonProperty>)_properties).GetEnumerator();
+        protected override IEnumerator GetBaseEnumerator() => ((IEnumerable)_properties).GetEnumerator();
 
-        public static implicit operator JsonObject(JsonProperty[] properties) => new JsonObject(properties);
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_properties);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator JsonObject(JsonProperty[] value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return value.Length == 0 ? new JsonObject() : new JsonObject(value);
+        }
     }
 }

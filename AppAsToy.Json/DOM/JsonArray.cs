@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 #pragma warning disable CS8764
-#pragma warning disable CS8766
 
 namespace AppAsToy.Json.DOM
 {
-    public sealed class JsonArray : JsonElement, IJsonArray, IList<JsonElement>
+    public sealed class JsonArray : JsonElement
     {
         public static IJsonArray Empty { get; } = new JsonArray();
 
@@ -33,10 +33,6 @@ namespace AppAsToy.Json.DOM
 
         public override int Count => _items.Count;
 
-        public override JsonArray? asArray => this;
-        public override JsonArray toArray => this;
-
-
         public JsonArray()
         {
             _items = new List<JsonElement>();
@@ -53,31 +49,22 @@ namespace AppAsToy.Json.DOM
                 ?? throw new ArgumentNullException(nameof(items));
         }
 
-        public override int IndexOf(JsonElement item) => _items.IndexOf(item);
-        public override void Insert(int index, JsonElement item) => _items.Insert(index, item);
+
+        public override bool Contains(IJsonElement? item) => _items.Contains((item as JsonElement) ?? Null);
+        public override int IndexOf(IJsonElement? item) => _items.IndexOf((item as JsonElement) ?? Null);
+        public override int LastIndexOf(IJsonElement? item) => _items.LastIndexOf((item as JsonElement) ?? Null);
+        public override int FindIndex(Predicate<IJsonElement> func) => _items.FindIndex(func);
+        public override int FindLastIndex(Predicate<IJsonElement> func) => _items.FindLastIndex(func);
+        public override JsonElement Find(Predicate<IJsonElement> func) => _items.Find(func);
+        public override JsonElement FindLast(Predicate<IJsonElement> func) => _items.FindLast(func);
+        public override void Add(JsonElement element) => _items.Add(element);
+        public override void AddRange(IEnumerable<JsonElement> elements) => _items.AddRange(elements);
+        public override void Insert(int index, JsonElement element) => _items.Insert(index, element);
+        public override bool Remove(JsonElement element) => _items.Remove(element);
         public override void RemoveAt(int index) => _items.RemoveAt(index);
-        public override void Add(JsonElement item) => _items.Add(item);
+        public override void RemoveRange(int index, int count) => _items.RemoveRange(index, count);
+        public override int RemoveAll(Predicate<IJsonElement> func) => _items.RemoveAll(func);
         public override void Clear() => _items.Clear();
-        public override bool Contains(JsonElement item) => _items.Contains(item);
-        public override void CopyTo(JsonElement[] array, int arrayIndex) => _items.CopyTo(array, arrayIndex);
-        public override bool Remove(JsonElement item) => _items.Remove(item);
-
-
-        public ArrayEnumerator<JsonElement> GetEnumerator() => new ArrayEnumerator<JsonElement>(_items);
-
-        ArrayEnumerator<IJsonElement> IJsonArray.GetEnumerator() => new ArrayEnumerator<IJsonElement>(_items);
-
-        protected override IEnumerator<JsonElement> GetReferenceEnumerator()
-        {
-            return ((IEnumerable<JsonElement>)_items).GetEnumerator();
-        }
-
-        protected override IEnumerator GetBaseEnumerator()
-        {
-            return ((IEnumerable)_items).GetEnumerator();
-        }
-
-        public override string ToString() => ToString(true);
 
         public override string ToString(bool writeIndented)
         {
@@ -91,6 +78,31 @@ namespace AppAsToy.Json.DOM
                 array._items.SequenceEqual(_items);
         }
 
-        public static implicit operator JsonArray(JsonElement?[] elements) => new JsonArray(elements);
+        public override ArrayEnumerator<JsonElement> GetEnumerator() => new(_items, _items.Count);
+        protected override ArrayEnumerator<IJsonElement> GetReadOnlyEnumerator() => new(_items, _items.Count);
+        protected override IEnumerator<IJsonElement> GetDefaultEnumerator() => ((IEnumerable<JsonElement>)_items).GetEnumerator();
+        protected override IEnumerator GetBaseEnumerator() => ((IEnumerable)_items).GetEnumerator();
+
+
+        public override bool Equals(object? obj)
+        {
+            return obj is JsonArray array &&
+                   base.Equals(obj) &&
+                   EqualityComparer<List<JsonElement>>.Default.Equals(_items, array._items);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_items);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator JsonArray(JsonElement?[] value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return value.Length == 0 ? new JsonArray() : new JsonArray(value);
+        }
     }
 }

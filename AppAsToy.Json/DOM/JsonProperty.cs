@@ -2,19 +2,39 @@
 
 namespace AppAsToy.Json.DOM
 {
-    public readonly struct JsonProperty : IEquatable<JsonProperty>
+    public sealed class JsonProperty : JsonElement
     {
-        public string Name { get; }
+        private JsonElement _value;
 
-        public JsonElement Value { get; }
+        public override JsonElementType Type => JsonElementType.Property;
 
-        public JsonProperty(string name, JsonElement? value)
+        public override string Key { get; }
+
+        public override JsonElement Value
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Value = value ?? JsonElement.Null;
+            get => _value;
+            set => _value = value ?? Null;
         }
 
-        public bool Equals(JsonProperty other)
-            => Name == other.Name && Value.Equals(other.Value);
+        public JsonProperty(string key, JsonElement? value)
+        {
+            Key = key ?? throw new ArgumentNullException(nameof(key));
+            _value = value ?? Null;
+        }
+
+        public override string ToString(bool writeIndented)
+        {
+            return new JsonElementSerializer(writeIndented).Serialize(this);
+        }
+
+        protected override bool IsEqual(JsonElement? element) =>
+            element is JsonProperty property &&
+            Key == property.Key &&
+            Value.Equals(property.Value);
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Key, Value);
+        }
     }
 }
