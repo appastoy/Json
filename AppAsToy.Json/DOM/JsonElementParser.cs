@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
@@ -28,25 +29,20 @@ internal ref struct JsonElementParser
 
     private IJsonElement ParseElement()
     {
-        switch (GetNextToken())
+        return MoveNextToken() switch
         {
-            case 'n': return ParseNull();
-            case 'f': return ParseFalse();
-            case 't': return ParseTrue();
-            case '"': return ParseString();
-            case '[': return ParseArray();
-            case '{': return ParseObject();
-
-            case '-': case '0': case '1': case '2': 
-            case '3': case '4': case '5': case '6': 
-            case '7': case '8': case '9':
-                return ParseNumber();
-
-            default: throw InvalidToken();
-        }
+            'n' => ParseNull(),
+            'f' => ParseFalse(),
+            't' => ParseTrue(),
+            '"' => ParseString(),
+            '[' => ParseArray(),
+            '{' => ParseObject(),
+            '-' or '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9' => ParseNumber(),
+            _ => throw InvalidToken(),
+        };
     }
 
-    private char GetNextToken()
+    private char MoveNextToken()
     {
         SkipWhiteSpace();
         if (_index >= _json.Length)
@@ -227,8 +223,32 @@ internal ref struct JsonElementParser
         if (RemainLength < 2)
             throw InvalidToken();
 
-        // TODO: Parse Array
-        return null;
+        StepForward(1);
+        var ch = MoveNextToken();
+        if (ch == ']')
+        {
+            StepForward(1);
+            return JsonArray.Empty;
+        }
+
+        return new JsonArray(ParseArrayItems());
+    }
+
+    private IEnumerable<JsonElement> ParseArrayItems()
+    {
+        while (_index < _json.Length)
+        {
+            yield return (JsonElement)ParseElement();
+            if (_json[_index] == ',')
+                StepForward(1);
+            var ch = MoveNextToken();
+            if (ch == ']')
+            {
+                StepForward(1);
+                yield break;
+            }
+        }
+        throw UnexpectedEndReached();
     }
 
     private IJsonElement ParseObject()
@@ -236,8 +256,48 @@ internal ref struct JsonElementParser
         if (RemainLength < 2)
             throw InvalidToken();
 
-        // TODO: Parse Object
-        return null;
+        StepForward(1);
+        var ch = MoveNextToken();
+        if (ch == '}')
+        {
+            StepForward(1);
+            return JsonObject.Empty;
+        }
+
+        return new JsonObject(ParseObjectProperties());
+    }
+
+    private IEnumerable<JsonProperty> ParseObjectProperties()
+    {
+        while (_index < _json.Length)
+        {
+            yield return ParseObjectProperty();
+            if (_json[_index] == ',')
+                StepForward(1);
+            var ch = MoveNextToken();
+            if (ch == '}')
+            {
+                StepForward(1);
+                yield break;
+            }
+        }
+        throw UnexpectedEndReached();
+    }
+
+    private JsonProperty ParseObjectProperty()
+    {
+        if (_json[_index] != '"')
+            throw InvalidToken();
+
+        var key = ParseString();
+        var ch = MoveNextToken();
+        if (ch != ':')
+            throw InvalidToken();
+
+        StepForward(1);
+        var value = ParseElement();
+
+        return new JsonProperty(key.ToStringValue, (JsonElement)value);
     }
 
     private void StepForward(int count)
@@ -260,6 +320,6 @@ internal ref struct JsonElementParser
 
     private JsonElementParsingException InvalidToken()
     {
-        return new JsonElementParsingException("invalid token", _line, _column);
+        return new JsonElementParsingException("Invalid token", _line, _column);
     }
 }

@@ -10,7 +10,7 @@ namespace AppAsToy.Json.DOM
 {
     public sealed class JsonObject : JsonElement
     {
-        public static IJsonObject Empty { get; } = new JsonObject();
+        public static IJsonElement Empty { get; } = new JsonObject();
 
         internal List<JsonProperty> _properties;
         private Dictionary<string, JsonElement> _propertyMap;

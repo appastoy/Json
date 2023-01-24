@@ -10,7 +10,7 @@ namespace AppAsToy.Json.DOM
 {
     public sealed class JsonArray : JsonElement
     {
-        public static IJsonArray Empty { get; } = new JsonArray();
+        public static IJsonElement Empty { get; } = new JsonArray();
 
         private readonly List<JsonElement> _items;
 
