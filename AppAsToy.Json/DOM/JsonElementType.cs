@@ -6,11 +6,6 @@
         Bool,
         String,
         Number,
-        DateTime,
-        DateTimeOffset,
-        TimeSpan,
-        Guid,
-        ByteArray,
         Array,
         Object,
         Property

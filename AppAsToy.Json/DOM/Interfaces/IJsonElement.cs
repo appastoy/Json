@@ -7,20 +7,14 @@ public interface IJsonElement :
     IJsonObject,
     IJsonProperty,
     IJsonValue
-
 {
     JsonElementType Type { get; }
     string ToString(bool writeIndented);
-    bool isNull { get; }
-    bool isBool { get; }
-    bool isString { get; }
-    bool isNumber { get; }
-    bool isDateTime { get; }
-    bool isDateTimeOffset { get; }
-    bool isTimeSpan { get; }
-    bool isGuid { get; }
-    bool isByteArray { get; }
-    bool isArray { get; }
-    bool isObject { get; }
-    bool isProperty { get; }
+    bool IsNull { get; }
+    bool IsBool { get; }
+    bool IsString { get; }
+    bool IsNumber { get; }
+    bool IsArray { get; }
+    bool IsObject { get; }
+    bool IsProperty { get; }
 }

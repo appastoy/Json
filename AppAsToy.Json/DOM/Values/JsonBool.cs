@@ -7,8 +7,8 @@
 
         public override JsonElementType Type => JsonElementType.Bool;
 
-        public override bool? asBool => RawValue;
-        public override bool toBool => RawValue;
+        public override bool? AsBool => RawValue;
+        public override bool ToBool => RawValue;
 
         private JsonBool(bool value) : base(value) { }
 

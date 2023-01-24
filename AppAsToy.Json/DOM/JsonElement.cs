@@ -17,18 +17,13 @@ namespace AppAsToy.Json.DOM
 
         public abstract JsonElementType Type { get; }
         
-        public bool isNull => Type == JsonElementType.Null;
-        public bool isBool => Type == JsonElementType.Bool;
-        public bool isString => Type == JsonElementType.String;
-        public bool isNumber => Type == JsonElementType.Number;
-        public bool isDateTime => Type == JsonElementType.DateTime;
-        public bool isDateTimeOffset => Type == JsonElementType.DateTimeOffset;
-        public bool isTimeSpan => Type == JsonElementType.TimeSpan;
-        public bool isGuid => Type == JsonElementType.Guid;
-        public bool isByteArray => Type == JsonElementType.ByteArray;
-        public bool isArray => Type == JsonElementType.Array;
-        public bool isObject => Type == JsonElementType.Object;
-        public bool isProperty => Type == JsonElementType.Property;
+        public bool IsNull => Type == JsonElementType.Null;
+        public bool IsBool => Type == JsonElementType.Bool;
+        public bool IsString => Type == JsonElementType.String;
+        public bool IsNumber => Type == JsonElementType.Number;
+        public bool IsArray => Type == JsonElementType.Array;
+        public bool IsObject => Type == JsonElementType.Object;
+        public bool IsProperty => Type == JsonElementType.Property;
         public abstract string ToString(bool writeIndented);
         public override string ToString() => ToString(true);
 
@@ -117,43 +112,43 @@ namespace AppAsToy.Json.DOM
 
         #region Casting Interfaces
 
-        public virtual double? asDouble => null;
-        public virtual float? asFloat => null;
-        public virtual sbyte? asSByte => null;
-        public virtual short? asShort => null;
-        public virtual int? asInt => null;
-        public virtual long? asLong => null;
-        public virtual byte? asByte => null;
-        public virtual ushort? asUShort => null;
-        public virtual uint? asUInt => null;
-        public virtual ulong? asULong => null;
-        public virtual decimal? asDecimal => null;
-        public virtual string? asString => null;
-        public virtual bool? asBool => null;
-        public virtual DateTime? asDateTime => null;
-        public virtual DateTimeOffset? asDateTimeOffset => null;
-        public virtual TimeSpan? asTimeSpan => null;
-        public virtual Guid? asGuid => null;
-        public virtual byte[]? asByteArray => null;
+        public virtual double? AsDouble => null;
+        public virtual float? AsFloat => null;
+        public virtual sbyte? AsSByte => null;
+        public virtual short? AsShort => null;
+        public virtual int? AsInt => null;
+        public virtual long? AsLong => null;
+        public virtual byte? AsByte => null;
+        public virtual ushort? AsUShort => null;
+        public virtual uint? AsUInt => null;
+        public virtual ulong? AsULong => null;
+        public virtual decimal? AsDecimal => null;
+        public virtual string? AsString => null;
+        public virtual bool? AsBool => null;
+        public virtual DateTime? AsDateTime => null;
+        public virtual DateTimeOffset? AsDateTimeOffset => null;
+        public virtual TimeSpan? AsTimeSpan => null;
+        public virtual Guid? AsGuid => null;
+        public virtual byte[]? AsByteArray => null;
 
-        public virtual double toDouble => throw new NotImplementedException();
-        public virtual float toFloat => throw new NotImplementedException();
-        public virtual sbyte toSByte => throw new NotImplementedException();
-        public virtual short toShort => throw new NotImplementedException();
-        public virtual int toInt => throw new NotImplementedException();
-        public virtual long toLong => throw new NotImplementedException();
-        public virtual byte toByte => throw new NotImplementedException();
-        public virtual ushort toUShort => throw new NotImplementedException();
-        public virtual uint toUInt => throw new NotImplementedException();
-        public virtual ulong toULong => throw new NotImplementedException();
-        public virtual decimal toDecimal => throw new NotImplementedException();
-        public virtual string toString => throw new NotImplementedException();
-        public virtual bool toBool => throw new NotImplementedException();
-        public virtual DateTime toDateTime => throw new NotImplementedException();
-        public virtual DateTimeOffset toDateTimeOffset => throw new NotImplementedException();
-        public virtual TimeSpan toTimeSpan => throw new NotImplementedException();
-        public virtual Guid toGuid => throw new NotImplementedException();
-        public virtual byte[] toByteArray => throw new NotImplementedException();
+        public virtual double ToDouble => throw new NotImplementedException();
+        public virtual float ToFloat => throw new NotImplementedException();
+        public virtual sbyte ToSByte => throw new NotImplementedException();
+        public virtual short ToShort => throw new NotImplementedException();
+        public virtual int ToInt => throw new NotImplementedException();
+        public virtual long ToLong => throw new NotImplementedException();
+        public virtual byte ToByte => throw new NotImplementedException();
+        public virtual ushort ToUShort => throw new NotImplementedException();
+        public virtual uint ToUInt => throw new NotImplementedException();
+        public virtual ulong ToULong => throw new NotImplementedException();
+        public virtual decimal ToDecimal => throw new NotImplementedException();
+        public virtual string ToStringValue => throw new NotImplementedException();
+        public virtual bool ToBool => throw new NotImplementedException();
+        public virtual DateTime ToDateTime => throw new NotImplementedException();
+        public virtual DateTimeOffset ToDateTimeOffset => throw new NotImplementedException();
+        public virtual TimeSpan ToTimeSpan => throw new NotImplementedException();
+        public virtual Guid ToGuid => throw new NotImplementedException();
+        public virtual byte[] ToByteArray => throw new NotImplementedException();
 
         #endregion Casting Interfaces
 
@@ -225,11 +220,11 @@ namespace AppAsToy.Json.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(uint value) => new JsonNumber(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(ulong value) => new JsonNumber(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(decimal value) => new JsonNumber(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(DateTime value) => new JsonDateTime(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(DateTimeOffset value) => new JsonDateTimeOffset(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(TimeSpan value) => new JsonTimeSpan(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(Guid value) => new JsonGuid(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(byte[] value) => new JsonByteArray(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(DateTime value) => JsonString.FromDateTime(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(DateTimeOffset value) => JsonString.FromDateTimeOffset(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(TimeSpan value) => JsonString.FromTimeSpan(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(Guid value) => JsonString.FromGuid(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator JsonElement(byte[] value) => JsonString.FromByteArray(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator JsonElement(JsonElement?[] value)
         {
