@@ -44,7 +44,7 @@ namespace AppAsToy.Json.DOM
         public JsonString(string value) : base(value ?? throw new ArgumentNullException(nameof(value))) { }
         public static JsonString FromByteArray(byte[] value) => new(Convert.ToBase64String(value ?? throw new ArgumentNullException(nameof(value))));
         public static JsonString FromDateTime(DateTime value) => new(value.ToString(@"yyyy\-MM\-dd HH\:mm\:ss"));
-        public static JsonString FromDateTimeOffset(DateTimeOffset value) => new(value.ToString(@"yyyy\-MM\-dd HH\:mm\:ssK"));
+        public static JsonString FromDateTimeOffset(DateTimeOffset value) => new(value.ToString(@"yyyy\-MM\-dd HH\:mm\:ss K"));
         public static JsonString FromTimeSpan(TimeSpan value) => new(value.ToString(@"d\.hh\:mm\:ss"));
         public static JsonString FromGuid(Guid value) => new(value.ToString());
 

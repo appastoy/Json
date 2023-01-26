@@ -17,9 +17,6 @@ namespace AppAsToy.Json.DOM
 
         public static bool TryParse(string json, out IJsonElement element)
         {
-            if (json == null)
-                throw new ArgumentNullException(nameof(json));
-
             try 
             {
                 element = Parse(json);
@@ -36,6 +33,9 @@ namespace AppAsToy.Json.DOM
         {
             if (json == null)
                 throw new ArgumentNullException(nameof(json));
+
+            if (json.Length == 0)
+                throw new ArgumentException("json is empty.");
 
             return new JsonElementParser(json).Parse();
         }

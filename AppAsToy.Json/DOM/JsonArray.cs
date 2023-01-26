@@ -83,14 +83,6 @@ namespace AppAsToy.Json.DOM
         protected override IEnumerator<IJsonElement> GetDefaultEnumerator() => ((IEnumerable<JsonElement>)_items).GetEnumerator();
         protected override IEnumerator GetBaseEnumerator() => ((IEnumerable)_items).GetEnumerator();
 
-
-        public override bool Equals(object? obj)
-        {
-            return obj is JsonArray array &&
-                   base.Equals(obj) &&
-                   EqualityComparer<List<JsonElement>>.Default.Equals(_items, array._items);
-        }
-
         public override int GetHashCode()
         {
             return HashCode.Combine(_items);

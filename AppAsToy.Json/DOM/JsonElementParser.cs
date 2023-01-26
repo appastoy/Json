@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AppAsToy.Json.DOM;
 
@@ -38,7 +38,7 @@ internal ref struct JsonElementParser
             '[' => ParseArray(),
             '{' => ParseObject(),
             '-' or '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9' => ParseNumber(),
-            _ => throw InvalidToken(),
+            _ => throw InvalidToken($"Unexpected character. ('{_json[_index]}'({(int)(_json[_index])}))"),
         };
     }
 
@@ -75,56 +75,44 @@ internal ref struct JsonElementParser
 
     private IJsonElement ParseNull()
     {
-        if (RemainLength >= 4 &&
-            _json[_index + 1] == 'u' &&
-            _json[_index + 2] == 'l' &&
-            _json[_index + 3] == 'l')
+        if (CanParseWord("null"))
         {
             StepForward(4);
             return JsonElement.Null;
         }
-        throw InvalidToken();
+        throw InvalidToken(4);
     }
-
-    
 
     private IJsonElement ParseTrue()
     {
-        if (RemainLength >= 4 &&
-            _json[_index + 1] == 'r' &&
-            _json[_index + 2] == 'u' &&
-            _json[_index + 3] == 'e')
+        if (CanParseWord("true"))
         {
             StepForward(4);
             return JsonBool.True;
         }
-        throw InvalidToken();
+        throw InvalidToken(4);
     }
 
     private IJsonElement ParseFalse()
     {
-        if (RemainLength >= 5 &&
-            _json[_index + 1] == 'a' &&
-            _json[_index + 2] == 'l' &&
-            _json[_index + 3] == 's' &&
-            _json[_index + 4] == 'e')
+        if (CanParseWord("false"))
         {
             StepForward(5);
             return JsonBool.False;
         }
-        throw InvalidToken();
+        throw InvalidToken(5);
     }
 
     private IJsonElement ParseString()
     {
         if (RemainLength < 2)
-            throw InvalidToken();
+            throw InvalidToken("String value is terminated abnormally.");
 
         var builder = new StringBuilder(4096);
         int currentIndex = _index + 1;
         while (currentIndex < _json.Length)
         {
-            var ch = _json[currentIndex++];
+            var ch = _json[currentIndex];
             if (ch == '\\')
             {
                 builder.Append(ParseEscapedString(ref currentIndex));
@@ -134,11 +122,12 @@ internal ref struct JsonElementParser
                 break;
 
             builder.Append(ch);
+            currentIndex++;
         }
         if (currentIndex >= _json.Length)
             throw UnexpectedEndReached();
 
-        StepForward(currentIndex - _index);
+        StepForward(currentIndex - _index + 1);
 
         if (builder.Length == 0)
             return JsonString.Empty;
@@ -148,18 +137,18 @@ internal ref struct JsonElementParser
 
     private char ParseEscapedString(ref int currentIndex)
     {
-        char ch;
+        currentIndex++;
         if (currentIndex >= _json.Length)
             throw UnexpectedEndReached();
 
-        ch = _json[currentIndex++];
+        var ch = _json[currentIndex++];
         if (ch == 'u')
         {
             if ((_json.Length - currentIndex) < 4)
-                throw InvalidToken();
+                throw InvalidToken("Unicode value is terminated abnormally.");
 
-            if (!char.TryParse(new string(_json.Slice(currentIndex, 4)), out var unicodeChar))
-                throw InvalidToken();
+            if (!char.TryParse(Regex.Unescape(new string(_json.Slice(currentIndex - 2, 6))), out var unicodeChar))
+                throw InvalidToken("Unicode value is not valid.");
 
             currentIndex += 4;
             return unicodeChar;
@@ -175,19 +164,18 @@ internal ref struct JsonElementParser
             '/' => '/',
             '\\' => '\\',
             '"' => '"',
-            _ => throw InvalidToken()
+            _ => throw InvalidToken($"Unexpected character is escaped. ('{ch}'({(int)ch}))")
         };
     }
 
     private IJsonElement ParseNumber()
     {
+        const NumberStyles jsonNumberStyles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign;
+
         var length = GetNumberEndIndex() - _index;
-        if (!double.TryParse(
-            _json.Slice(_index, length), 
-            NumberStyles.Any, 
-            CultureInfo.InvariantCulture,  
-            out var value))
-            throw InvalidToken();
+        var numberString = _json.Slice(_index, length);
+        if (!double.TryParse(numberString, jsonNumberStyles, CultureInfo.InvariantCulture, out var value))
+            throw InvalidToken($"Can't parse to number. (\"{new string(numberString)}\")");
 
         StepForward(length);
 
@@ -195,6 +183,25 @@ internal ref struct JsonElementParser
             return JsonNumber.Zero;
 
         return new JsonNumber(value);
+    }
+
+    bool CanParseWord(ReadOnlySpan<char> word)
+    {
+        if (RemainLength < word.Length)
+            return false;
+
+        if (!word.SequenceEqual(_json.Slice(_index, word.Length)))
+            return false;
+
+        var nextCharacterIndex = _index + word.Length;
+        if (nextCharacterIndex >= _json.Length)
+            return true;
+
+        return _json[nextCharacterIndex] switch
+        {
+            ',' or '\r' or '\n' or ' ' or '\t' or ']' or '}' => true,
+            _ => false
+        };
     }
 
     int GetNumberEndIndex()
@@ -221,7 +228,7 @@ internal ref struct JsonElementParser
     private IJsonElement ParseArray()
     {
         if (RemainLength < 2)
-            throw InvalidToken();
+            throw InvalidToken("Array is terminated abnormally.");
 
         StepForward(1);
         var ch = MoveNextToken();
@@ -231,21 +238,20 @@ internal ref struct JsonElementParser
             return JsonArray.Empty;
         }
 
-        return new JsonArray(ParseArrayItems());
-    }
-
-    private IEnumerable<JsonElement> ParseArrayItems()
-    {
+        var array = new JsonArray();
         while (_index < _json.Length)
         {
-            yield return (JsonElement)ParseElement();
-            if (_json[_index] == ',')
+            array.Add((JsonElement)ParseElement());
+            ch = MoveNextToken();
+            if (ch == ',')
+            {
                 StepForward(1);
-            var ch = MoveNextToken();
+                ch = MoveNextToken();
+            }
             if (ch == ']')
             {
                 StepForward(1);
-                yield break;
+                return array;
             }
         }
         throw UnexpectedEndReached();
@@ -254,7 +260,7 @@ internal ref struct JsonElementParser
     private IJsonElement ParseObject()
     {
         if (RemainLength < 2)
-            throw InvalidToken();
+            throw InvalidToken("Object is terminated abnormally.");
 
         StepForward(1);
         var ch = MoveNextToken();
@@ -264,40 +270,39 @@ internal ref struct JsonElementParser
             return JsonObject.Empty;
         }
 
-        return new JsonObject(ParseObjectProperties());
-    }
-
-    private IEnumerable<JsonProperty> ParseObjectProperties()
-    {
+        var obj = new JsonObject();
         while (_index < _json.Length)
         {
-            yield return ParseObjectProperty();
-            if (_json[_index] == ',')
+            ParseObjectProperty(obj);
+            ch = MoveNextToken();
+            if (ch == ',')
+            {
                 StepForward(1);
-            var ch = MoveNextToken();
+                ch = MoveNextToken();
+            }
             if (ch == '}')
             {
                 StepForward(1);
-                yield break;
+                return obj;
             }
         }
         throw UnexpectedEndReached();
     }
 
-    private JsonProperty ParseObjectProperty()
+    private void ParseObjectProperty(JsonObject obj)
     {
         if (_json[_index] != '"')
-            throw InvalidToken();
+            throw InvalidToken("Object property key is not a string value.");
 
         var key = ParseString();
         var ch = MoveNextToken();
         if (ch != ':')
-            throw InvalidToken();
+            throw InvalidToken("Object property doesn't have colon(:).");
 
         StepForward(1);
         var value = ParseElement();
 
-        return new JsonProperty(key.ToStringValue, (JsonElement)value);
+        obj.Add(key.ToStringValue, (JsonElement)value);
     }
 
     private void StepForward(int count)
@@ -315,11 +320,16 @@ internal ref struct JsonElementParser
 
     private JsonElementParsingException UnexpectedEndReached()
     {
-        return new JsonElementParsingException("Parsing has not yet completed, but the end of the string has been reached.");
+        return new JsonElementParsingException("Parsing has not yet completed, but the end of the string has been reached.", _line, _column);
     }
 
-    private JsonElementParsingException InvalidToken()
+    private JsonElementParsingException InvalidToken(string message)
     {
-        return new JsonElementParsingException("Invalid token", _line, _column);
+        return new JsonElementParsingException($"Invalid token - {message}", _line, _column);
+    }
+
+    private JsonElementParsingException InvalidToken(int characterCount)
+    {
+        return new JsonElementParsingException($"Invalid token - \"{new string(_json.Slice(_index, Math.Min(_json.Length - _index, characterCount)))}\"", _line, _column);
     }
 }

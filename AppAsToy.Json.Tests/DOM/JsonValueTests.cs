@@ -141,7 +141,7 @@ public class JsonValueTests
         nowJson.Equals(now).Should().BeTrue();
         (nowJson == now).Should().BeTrue();
         (nowJson != now).Should().BeFalse();
-        nowJson.RawValue.Should().Be(now.ToString(@"yyyy\-MM\-dd HH\:mm\:ssK"));
+        nowJson.RawValue.Should().Be(now.ToString(@"yyyy\-MM\-dd HH\:mm\:ss K"));
         ((object)(JsonElement)new DateTimeOffset(1, 2, 3, 4, 5, 6, TimeSpan.FromHours(9))).Should().Be(new DateTimeOffset(1, 2, 3, 4, 5, 6, TimeSpan.FromHours(9)));
     }
 
@@ -175,7 +175,7 @@ public class JsonValueTests
         (randomJson != randomGuid).Should().BeFalse();
         randomJson.RawValue.Should().Be(randomGuid.ToString());
         ((object)(JsonElement)randomJson).Should().Be(randomGuid);
-        Regex.IsMatch(randomJson.ToString(), @"""[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}""").Should().BeTrue();
+        randomJson.ToString().Should().Be($"\"{randomGuid.ToString()}\"");
     }
 
     [Fact]
