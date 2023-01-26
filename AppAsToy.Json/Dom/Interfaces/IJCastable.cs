@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Globalization;
 
-namespace AppAsToy.Json.DOM;
-public interface IJsonValue :
+namespace AppAsToy.Json;
+public interface IJCastable :
     IEquatable<float>,
     IEquatable<double>,
     IEquatable<decimal>,
@@ -34,11 +35,12 @@ public interface IJsonValue :
     decimal? AsDecimal { get; }
     string? AsString { get; }
     bool? AsBool { get; }
-    DateTime? AsDateTime { get; }
-    DateTimeOffset? AsDateTimeOffset { get; }
-    TimeSpan? AsTimeSpan { get; }
-    Guid? AsGuid { get; }
     byte[]? AsByteArray { get; }
+    DateTime? AsDateTime(string? format = null, IFormatProvider? formatProvider = null, DateTimeStyles dateTimeStyles = DateTimeStyles.None);
+    DateTimeOffset? AsDateTimeOffset(string? format = null, IFormatProvider? formatProvider = null, DateTimeStyles dateTimeStyles = DateTimeStyles.None);
+    TimeSpan? AsTimeSpan(string? format = null, IFormatProvider? formatProvider = null, TimeSpanStyles timeSpanStyles = TimeSpanStyles.None);
+    Guid? AsGuid(string? format = null);
+    
 
     double ToDouble { get; }
     float ToFloat { get; }
@@ -53,9 +55,9 @@ public interface IJsonValue :
     decimal ToDecimal { get; }
     string ToStringValue { get; }
     bool ToBool { get; }
-    DateTime ToDateTime { get; }
-    DateTimeOffset ToDateTimeOffset { get; }
-    TimeSpan ToTimeSpan { get; }
-    Guid ToGuid { get; }
     byte[] ToByteArray { get; }
+    DateTime ToDateTime(string? format = null, IFormatProvider? formatProvider = null, DateTimeStyles dateTimeStyles = DateTimeStyles.None);
+    DateTimeOffset ToDateTimeOffset(string? format = null, IFormatProvider? formatProvider = null, DateTimeStyles dateTimeStyles = DateTimeStyles.None);
+    TimeSpan ToTimeSpan(string? format = null, IFormatProvider? formatProvider = null, TimeSpanStyles timeSpanStyles = TimeSpanStyles.None);
+    Guid ToGuid(string? format = null);
 }

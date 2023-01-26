@@ -1,24 +1,22 @@
-﻿using AppAsToy.Json.DOM;
-
-namespace AppAsToy.Json.Tests.DOM;
-public class JsonArrayTests
+﻿namespace AppAsToy.Json.Tests;
+public class JArrayTests
 {
     [Fact]
     public void ConstructWithParams()
     {
-        JsonArray array = new
+        JArray array = new
         (
             1,
             "a",
             true,
             null,
-            new JsonArray
+            new JArray
             (
                 2,
                 "b",
                 false
             ),
-            new JsonObject
+            new JObject
             (
                 new("a", 1),
                 new("b", "a"),
@@ -33,19 +31,19 @@ public class JsonArrayTests
     [Fact]
     public void ConstructWithEnumerables()
     {
-        JsonArray array = new(new JsonElement?[]
+        JArray array = new(new JElement?[]
         {
             1,
             "a",
             true,
             null,
-            new JsonElement?[]
+            new JElement?[]
             {
                 2,
                 "b",
                 false
             },
-            new JsonProperty[]
+            new JProperty[]
             {
                 new("a", 1),
                 new("b", "a"),
@@ -60,19 +58,19 @@ public class JsonArrayTests
     [Fact]
     public void CastFromEnumerables()
     {
-        JsonArray array = new JsonElement?[]
+        JArray array = new JElement?[]
         {
             1,
             "a",
             true,
             null,
-            new JsonElement?[]
+            new JElement?[]
             {
                 2,
                 "b",
                 false
             },
-            new JsonProperty[]
+            new JProperty[]
             {
                 new("a", 1),
                 new("b", "a"),
@@ -87,19 +85,19 @@ public class JsonArrayTests
     [Fact]
     public void InitializeByProperty()
     {
-        JsonArray array = new()
+        JArray array = new()
         {
             [0] = 1,
             [1] = "a",
             [2] = true,
             [3] = null,
-            [4] = new JsonArray
+            [4] = new JArray
             {
                 [0] = 2,
                 [1] = "b",
                 [2] = false
             },
-            [5] = new JsonObject
+            [5] = new JObject
             {
                 ["a"] = 1,
                 ["b"] = "a",
@@ -111,7 +109,7 @@ public class JsonArrayTests
         TestJsonArray(array);
     }
 
-    private static void TestJsonArray(JsonArray array)
+    private static void TestJsonArray(JArray array)
     {
         array.Count.Should().Be(6);
         (array[0] == 1).Should().BeTrue();

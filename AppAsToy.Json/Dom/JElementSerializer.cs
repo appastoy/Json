@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace AppAsToy.Json.DOM
+namespace AppAsToy.Json
 {
-    internal struct JsonElementSerializer
+    internal ref struct JElementSerializer
     {
         private static readonly string[] _indents =
         {
@@ -24,45 +24,44 @@ namespace AppAsToy.Json.DOM
             "                              ", // 15
         };
 
-        private bool _writeIndented;
-        private StringBuilder _builder;
+        private readonly bool _writeIndent;
+        private readonly string? _numberFormat;
+        private readonly bool _escapeUnicode;
+        private readonly StringBuilder _builder;
 
-        public JsonElementSerializer(bool writeIndented)
+        public JElementSerializer(bool writeIndent, string? numberFormat, bool escapeUnicode)
         {
-            _writeIndented = writeIndented;
+            _writeIndent = writeIndent;
+            _numberFormat = numberFormat;
+            _escapeUnicode = escapeUnicode;
             _builder = new StringBuilder(4096);
         }
 
-        public string Serialize(JsonElement element)
+        public string Serialize(JElement element)
         {
             _builder.Clear();
 
             if (element is null)
                 return "null";
 
-            if (element is JsonArray array)
-                SerializeArray(array, 0);
-            else if (element is JsonObject @object)
-                SerializeObject(@object, 0);
-            else
-                return element.ToString();
+            SerializeElement(element, 0);
 
             return _builder.ToString();
         }
 
-        private void SerializeElement(JsonElement? element, int depth)
+        private void SerializeElement(JElement? element, int depth)
         {
             if (element is null)
                 _builder.Append("null");
-            else if (element is JsonArray array)
+            else if (element is JArray array)
                 SerializeArray(array, depth);
-            else if (element is JsonObject @object)
+            else if (element is JObject @object)
                 SerializeObject(@object, depth);
             else
-                _builder.Append(element.ToString());
+                _builder.Append(element.Serialize(_writeIndent, _numberFormat, _escapeUnicode));
         }
 
-        private void SerializeArray(JsonArray array, int depth)
+        private void SerializeArray(JArray array, int depth)
         {
             _builder.Append('[');
 
@@ -81,7 +80,7 @@ namespace AppAsToy.Json.DOM
             _builder.Append(']');
         }
 
-        private void SerializeObject(JsonObject @object, int depth)
+        private void SerializeObject(JObject @object, int depth)
         {
             _builder.Append('{');
 
@@ -101,16 +100,16 @@ namespace AppAsToy.Json.DOM
             _builder.Append('}');
         }
 
-        private void SerializeProperty(JsonProperty property, int depth)
+        private void SerializeProperty(JProperty property, int depth)
         {
-            _builder.Append(JsonString.ConvertToJson(property.Key));
+            _builder.Append(JString.ConvertToJson(property.PropertyName, _escapeUnicode));
             AppendColon();
-            SerializeElement(property.Value, depth);
+            SerializeElement(property.PropertyValue, depth);
         }
 
         private void AppendLine(int depth)
         {
-            if (!_writeIndented)
+            if (!_writeIndent)
                 return;
 
             _builder.AppendLine();
@@ -119,7 +118,7 @@ namespace AppAsToy.Json.DOM
 
         private void AppendComma(int depth)
         {
-            if (!_writeIndented)
+            if (!_writeIndent)
             {
                 _builder.Append(',');
                 return;
@@ -131,7 +130,7 @@ namespace AppAsToy.Json.DOM
 
         private void AppendColon()
         {
-            if (!_writeIndented)
+            if (!_writeIndent)
                 _builder.Append(':');
             else
                 _builder.Append(": ");

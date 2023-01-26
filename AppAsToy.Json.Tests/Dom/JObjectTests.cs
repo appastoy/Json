@@ -1,24 +1,22 @@
-﻿using AppAsToy.Json.DOM;
-
-namespace AppAsToy.Json.Tests.DOM;
-public class JsonObjectTests
+﻿namespace AppAsToy.Json.Tests;
+public class JObjectTests
 {
     [Fact]
     public void ConstructWithParams()
     {
-        JsonObject @object = new
+        JObject @object = new
         (
             new("a", 1),
             new("b", "a"),
             new("c", true),
             new("d", null),
-            new("e", new JsonObject
+            new("e", new JObject
             (
                 new("ea", 2),
                 new("eb", "b"),
                 new("ec", false)
             )),
-            new("f", new JsonArray
+            new("f", new JArray
             (
                 1,
                 "a",
@@ -33,19 +31,19 @@ public class JsonObjectTests
     [Fact]
     public void ConstructWithEnumerables()
     {
-        JsonObject @object = new(new JsonProperty[]
+        JObject @object = new(new JProperty[]
         {
             new ("a", 1),
             new ("b", "a"),
             new ("c", true),
             new ("d", null),
-            new("e", new JsonProperty[]
+            new("e", new JProperty[]
             {
                 new("ea", 2),
                 new("eb", "b"),
                 new("ec", false)
             }),
-            new("f", new JsonElement?[]
+            new("f", new JElement?[]
             {
                 1,
                 "a",
@@ -60,19 +58,19 @@ public class JsonObjectTests
     [Fact]
     public void CastFromEnumerables()
     {
-        JsonObject @object = new JsonProperty[]
+        JObject @object = new JProperty[]
         {
             new ("a", 1),
             new ("b", "a"),
             new ("c", true),
             new ("d", null),
-            new("e", new JsonProperty[]
+            new("e", new JProperty[]
             {
                 new("ea", 2),
                 new("eb", "b"),
                 new("ec", false)
             }),
-            new("f", new JsonElement?[]
+            new("f", new JElement?[]
             {
                 1,
                 "a",
@@ -87,19 +85,19 @@ public class JsonObjectTests
     [Fact]
     public void InitializeByProperty()
     {
-        JsonObject @object = new()
+        JObject @object = new()
         {
             ["a"] = 1,
             ["b"] = "a",
             ["c"] = true,
             ["d"] = null,
-            ["e"] = new JsonObject
+            ["e"] = new JObject
             {
                 ["ea"] = 2,
                 ["eb"] = "b",
                 ["ec"] = false
             },
-            ["f"] = new JsonArray
+            ["f"] = new JArray
             {
                 [0] = 1,
                 [1] = "a",
@@ -111,7 +109,7 @@ public class JsonObjectTests
         TestJsonObject(@object);
     }
 
-    private static void TestJsonObject(JsonObject @object)
+    private static void TestJsonObject(JObject @object)
     {
         @object.Count.Should().Be(6);
         (@object["a"] == 1).Should().BeTrue();

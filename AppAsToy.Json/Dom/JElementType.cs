@@ -1,6 +1,6 @@
-﻿namespace AppAsToy.Json.DOM
+﻿namespace AppAsToy.Json
 {
-    public enum JsonElementType
+    public enum JElementType
     {
         Null,
         Bool,

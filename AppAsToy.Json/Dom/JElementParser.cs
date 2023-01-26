@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace AppAsToy.Json.DOM;
+namespace AppAsToy.Json;
 
-internal ref struct JsonElementParser
+internal ref struct JElementParser
 {
     private ReadOnlySpan<char> _json;
     private int _index;
@@ -14,7 +14,7 @@ internal ref struct JsonElementParser
 
     private int RemainLength => _json.Length - _index;
 
-    public JsonElementParser(string json)
+    public JElementParser(string json)
     {
         _json = json;
         _index = 0;
@@ -22,12 +22,12 @@ internal ref struct JsonElementParser
         _column = 0;
     }
 
-    public IJsonElement Parse()
+    public JElement Parse()
     {
         return ParseElement();
     }
 
-    private IJsonElement ParseElement()
+    private JElement ParseElement()
     {
         return MoveNextToken() switch
         {
@@ -73,37 +73,37 @@ internal ref struct JsonElementParser
         }
     }
 
-    private IJsonElement ParseNull()
+    private JElement ParseNull()
     {
         if (CanParseWord("null"))
         {
             StepForward(4);
-            return JsonElement.Null;
+            return JElement.Null;
         }
         throw InvalidToken(4);
     }
 
-    private IJsonElement ParseTrue()
+    private JElement ParseTrue()
     {
         if (CanParseWord("true"))
         {
             StepForward(4);
-            return JsonBool.True;
+            return JBool.True;
         }
         throw InvalidToken(4);
     }
 
-    private IJsonElement ParseFalse()
+    private JElement ParseFalse()
     {
         if (CanParseWord("false"))
         {
             StepForward(5);
-            return JsonBool.False;
+            return JBool.False;
         }
         throw InvalidToken(5);
     }
 
-    private IJsonElement ParseString()
+    private JElement ParseString()
     {
         if (RemainLength < 2)
             throw InvalidToken("String value is terminated abnormally.");
@@ -130,9 +130,9 @@ internal ref struct JsonElementParser
         StepForward(currentIndex - _index + 1);
 
         if (builder.Length == 0)
-            return JsonString.Empty;
+            return JString.Empty;
 
-        return new JsonString(builder.ToString());
+        return new JString(builder.ToString());
     }
 
     private char ParseEscapedString(ref int currentIndex)
@@ -147,11 +147,11 @@ internal ref struct JsonElementParser
             if ((_json.Length - currentIndex) < 4)
                 throw InvalidToken("Unicode value is terminated abnormally.");
 
-            if (!char.TryParse(Regex.Unescape(new string(_json.Slice(currentIndex - 2, 6))), out var unicodeChar))
+            if (!ushort.TryParse(_json.Slice(currentIndex, 4), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out var result))
                 throw InvalidToken("Unicode value is not valid.");
 
             currentIndex += 4;
-            return unicodeChar;
+            return (char)result;
         }
 
         return ch switch
@@ -168,7 +168,7 @@ internal ref struct JsonElementParser
         };
     }
 
-    private IJsonElement ParseNumber()
+    private JElement ParseNumber()
     {
         const NumberStyles jsonNumberStyles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign;
 
@@ -180,9 +180,9 @@ internal ref struct JsonElementParser
         StepForward(length);
 
         if (value == 0d)
-            return JsonNumber.Zero;
+            return JNumber.Zero;
 
-        return new JsonNumber(value);
+        return new JNumber(value);
     }
 
     bool CanParseWord(ReadOnlySpan<char> word)
@@ -225,23 +225,24 @@ internal ref struct JsonElementParser
         return currentIndex;
     }
 
-    private IJsonElement ParseArray()
+    private JElement ParseArray()
     {
         if (RemainLength < 2)
             throw InvalidToken("Array is terminated abnormally.");
 
         StepForward(1);
+
+        var array = new JArray();
         var ch = MoveNextToken();
         if (ch == ']')
         {
             StepForward(1);
-            return JsonArray.Empty;
+            return array;
         }
-
-        var array = new JsonArray();
+        
         while (_index < _json.Length)
         {
-            array.Add((JsonElement)ParseElement());
+            array.Add(ParseElement());
             ch = MoveNextToken();
             if (ch == ',')
             {
@@ -257,20 +258,21 @@ internal ref struct JsonElementParser
         throw UnexpectedEndReached();
     }
 
-    private IJsonElement ParseObject()
+    private JElement ParseObject()
     {
         if (RemainLength < 2)
             throw InvalidToken("Object is terminated abnormally.");
 
         StepForward(1);
+
+        var obj = new JObject();
         var ch = MoveNextToken();
         if (ch == '}')
         {
             StepForward(1);
-            return JsonObject.Empty;
+            return obj;
         }
-
-        var obj = new JsonObject();
+        
         while (_index < _json.Length)
         {
             ParseObjectProperty(obj);
@@ -289,7 +291,7 @@ internal ref struct JsonElementParser
         throw UnexpectedEndReached();
     }
 
-    private void ParseObjectProperty(JsonObject obj)
+    private void ParseObjectProperty(JObject obj)
     {
         if (_json[_index] != '"')
             throw InvalidToken("Object property key is not a string value.");
@@ -302,7 +304,7 @@ internal ref struct JsonElementParser
         StepForward(1);
         var value = ParseElement();
 
-        obj.Add(key.ToStringValue, (JsonElement)value);
+        obj.Add(key.ToStringValue, value);
     }
 
     private void StepForward(int count)
@@ -318,18 +320,18 @@ internal ref struct JsonElementParser
         _column = 0;
     }
 
-    private JsonElementParsingException UnexpectedEndReached()
+    private JElementParseException UnexpectedEndReached()
     {
-        return new JsonElementParsingException("Parsing has not yet completed, but the end of the string has been reached.", _line, _column);
+        return new JElementParseException("Parsing has not yet completed, but the end of the string has been reached.", _line, _column);
     }
 
-    private JsonElementParsingException InvalidToken(string message)
+    private JElementParseException InvalidToken(string message)
     {
-        return new JsonElementParsingException($"Invalid token - {message}", _line, _column);
+        return new JElementParseException($"Invalid token - {message}", _line, _column);
     }
 
-    private JsonElementParsingException InvalidToken(int characterCount)
+    private JElementParseException InvalidToken(int characterCount)
     {
-        return new JsonElementParsingException($"Invalid token - \"{new string(_json.Slice(_index, Math.Min(_json.Length - _index, characterCount)))}\"", _line, _column);
+        return new JElementParseException($"Invalid token - \"{new string(_json.Slice(_index, Math.Min(_json.Length - _index, characterCount)))}\"", _line, _column);
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace AppAsToy.Json.DOM
+namespace AppAsToy.Json
 {
-    public sealed class JsonNumber : JsonValue<double>
+    public sealed class JNumber : JValue<double>
     {
-        public static JsonNumber Zero { get; } = new JsonNumber(0.0d);
-        public static JsonNumber MinValue { get; } = new JsonNumber(double.MinValue);
-        public static JsonNumber MaxValue { get; } = new JsonNumber(double.MaxValue);
+        public static JNumber Zero { get; } = new JNumber(0.0d);
+        public static JNumber MinValue { get; } = new JNumber(double.MinValue);
+        public static JNumber MaxValue { get; } = new JNumber(double.MaxValue);
 
-        public override JsonElementType Type => JsonElementType.Number;
+        public override JElementType Type => JElementType.Number;
 
         public override double? AsDouble { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => RawValue; }
         public override float? AsFloat { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (float)RawValue; }
@@ -34,19 +34,23 @@ namespace AppAsToy.Json.DOM
         public override ulong ToULong { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (ulong)RawValue; }
         public override decimal ToDecimal { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (decimal)RawValue; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(double value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(float value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(sbyte value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(short value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(int value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(long value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(byte value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(ushort value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(uint value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(ulong value) : base(value) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JsonNumber(decimal value) : base((double)value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(double value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(float value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(sbyte value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(short value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(int value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(long value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(byte value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(ushort value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(uint value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(ulong value) : base(value) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public JNumber(decimal value) : base((double)value) { }
 
-        public override string ToString(bool _) => RawValue.ToString();
+        public override string Serialize(bool _, string? format = null, bool ___ = false) 
+            => format != null 
+            ? RawValue.ToString(format) 
+            : RawValue.ToString();
+
         public string ToString(string format) => RawValue.ToString(format);
 
         public override bool Equals(float other) => ToFloat == other;
