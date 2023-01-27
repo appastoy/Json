@@ -75,7 +75,7 @@ internal ref struct JElementParser
 
     private JElement ParseNull()
     {
-        if (CanParseWord("null"))
+        if (TryParseKeyword("null"))
         {
             StepForward(4);
             return JElement.Null;
@@ -85,7 +85,7 @@ internal ref struct JElementParser
 
     private JElement ParseTrue()
     {
-        if (CanParseWord("true"))
+        if (TryParseKeyword("true"))
         {
             StepForward(4);
             return JBool.True;
@@ -95,7 +95,7 @@ internal ref struct JElementParser
 
     private JElement ParseFalse()
     {
-        if (CanParseWord("false"))
+        if (TryParseKeyword("false"))
         {
             StepForward(5);
             return JBool.False;
@@ -185,7 +185,7 @@ internal ref struct JElementParser
         return new JNumber(value);
     }
 
-    bool CanParseWord(ReadOnlySpan<char> word)
+    bool TryParseKeyword(ReadOnlySpan<char> word)
     {
         if (RemainLength < word.Length)
             return false;
