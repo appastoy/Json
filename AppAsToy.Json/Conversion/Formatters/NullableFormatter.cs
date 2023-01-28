@@ -1,5 +1,7 @@
 ﻿namespace AppAsToy.Json.Conversion.Formatters;
-internal sealed class NullableFormatter<T> : IFormatter<T?>
+internal sealed class NullableFormatter<T> : 
+    SharedFormatter<T?, NullableFormatter<T>>,
+    IFormatter<T?>
     where T : struct
 {
     public void Read(ref JReader reader, out T? value)

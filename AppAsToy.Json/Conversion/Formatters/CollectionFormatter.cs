@@ -4,8 +4,14 @@
 
 namespace AppAsToy.Json.Conversion.Formatters;
 
-internal abstract class CollectionFormatter<T, TList> : IFormatter<TList>
+public sealed class ListFormatter<T> : CollectionFormatter<T, List<T>, ListFormatter<T>> { public override void Read(ref JReader reader, out List<T>? value) => value = ReadList(ref reader); }
+public sealed class ArrayFormatter<T> : CollectionFormatter<T, T[], ArrayFormatter<T>> { public override void Read(ref JReader reader, out T[]? value) => value = ReadList(ref reader)?.ToArray(); }
+
+public abstract class CollectionFormatter<T, TList, TFormatter> :
+    SharedFormatter<TList, TFormatter>,
+    IFormatter<TList>
     where TList : class, IList<T>
+    where TFormatter : class, IFormatter<TList>, new()
 {
     public abstract void Read(ref JReader reader, out TList value);
 
@@ -48,5 +54,3 @@ internal abstract class CollectionFormatter<T, TList> : IFormatter<TList>
     }
 }
 
-internal sealed class ListFormatter<T> : CollectionFormatter<T, List<T>> { public override void Read(ref JReader reader, out List<T>? value) => value = ReadList(ref reader); }
-internal sealed class ArrayFormatter<T> : CollectionFormatter<T, T[]> { public override void Read(ref JReader reader, out T[]? value) => value = ReadList(ref reader)?.ToArray(); }

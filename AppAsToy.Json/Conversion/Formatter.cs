@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 
 namespace AppAsToy.Json.Conversion;
-internal static class Formatter<T>
+public static class Formatter<T>
 {
     public static readonly IFormatter<T> Shared;
 

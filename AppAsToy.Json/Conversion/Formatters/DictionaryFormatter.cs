@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 
 namespace AppAsToy.Json.Conversion.Formatters;
-internal sealed class DictionaryFormatter<T> : IFormatter<Dictionary<string, T>>
+internal sealed class DictionaryFormatter<T> : 
+    SharedFormatter<Dictionary<string, T>, DictionaryFormatter<T>>,
+    IFormatter<Dictionary<string, T>>
 {
     public void Read(ref JReader reader, out Dictionary<string, T>? value)
     {
