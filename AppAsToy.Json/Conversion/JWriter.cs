@@ -52,7 +52,7 @@ public ref struct JWriter
     public void WriteArrayStart() => WriteStart('[');
     public void WriteArrayEnd() => WriteEnd(']');
     public void WriteEmptyObject() => WriteCore("{}");
-    public void WriteOjectStart() => WriteStart('{');
+    public void WriteObjectStart() => WriteStart('{');
     public void WriteObjectEnd() => WriteEnd('}');
     public void WritePropertyName(string name)
     {

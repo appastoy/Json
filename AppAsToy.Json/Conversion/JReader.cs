@@ -19,7 +19,17 @@ public ref struct JReader
         _line = 0;
         _column = 0;
     }
-    
+
+    public bool TryReadNull()
+    {
+        var ch = MoveNextToken();
+        return ch switch
+        {
+            'n' => TryReadKeyword("null") ? true: throw InvalidToken($"Invalid null string."),
+            _ => false
+        };
+    }
+
     public bool? ReadBoolOrNull()
     {
         var ch = MoveNextToken();
