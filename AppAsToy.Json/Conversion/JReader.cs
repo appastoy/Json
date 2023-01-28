@@ -20,7 +20,7 @@ public ref struct JReader
         _column = 0;
     }
     
-    public bool? ReadBool()
+    public bool? ReadBoolOrNull()
     {
         var ch = MoveNextToken();
         return ch switch
@@ -31,7 +31,13 @@ public ref struct JReader
             _ => throw InvalidToken($"Can't read bool. ('{ch}'({((int)ch).ToString()}))"),
         };
     }
-    public double? ReadNumber()
+
+    public bool ReadBool()
+    {
+        return ReadBoolOrNull() ?? throw InvalidToken("Bool value should not be null.");
+    }
+
+    public double? ReadNumberOrNull()
     {
         var ch = MoveNextToken();
         return ch switch
@@ -41,7 +47,13 @@ public ref struct JReader
             _ => throw InvalidToken($"Can't read number. ('{ch}'({((int)ch).ToString()}))"),
         };
     }
-    public string? ReadString()
+
+    public double ReadNumber()
+    {
+        return ReadNumberOrNull() ?? throw InvalidToken("Number value should not be null.");
+    }
+
+    public string? ReadStringOrNull()
     {
         var ch = MoveNextToken();
         return ch switch
@@ -51,6 +63,12 @@ public ref struct JReader
             _ => throw InvalidToken($"Can't read string. ('{ch}'({((int)ch).ToString()}))"),
         };
     }
+
+    public string ReadString()
+    {
+        return ReadStringOrNull() ?? throw InvalidToken("String value should not be null.");
+    }
+
     public bool ReadArray()
     {
         var ch = MoveNextToken();
@@ -81,7 +99,7 @@ public ref struct JReader
     }
     public string ReadPropertyName()
     {
-        var propertyName = ReadString();
+        var propertyName = ReadStringOrNull();
         if (propertyName == null)
             throw InvalidToken("Property name should not be null.");
 
