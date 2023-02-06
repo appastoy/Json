@@ -5,7 +5,9 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppAsToy.Json", "AppAsToy.Json\AppAsToy.Json.csproj", "{29C445D8-51E3-42D2-91DA-FD3F50D7D0EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppAsToy.Json.Tests", "AppAsToy.Json.Tests\AppAsToy.Json.Tests.csproj", "{F8443586-81A9-4BAD-BEE3-27198C503E83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppAsToy.Json.Tests", "AppAsToy.Json.Tests\AppAsToy.Json.Tests.csproj", "{F8443586-81A9-4BAD-BEE3-27198C503E83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AOTSandbox", "AOTSandbox\AOTSandbox.csproj", "{8FA20721-8C43-407A-8134-29B323FA60C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F8443586-81A9-4BAD-BEE3-27198C503E83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8443586-81A9-4BAD-BEE3-27198C503E83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8443586-81A9-4BAD-BEE3-27198C503E83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FA20721-8C43-407A-8134-29B323FA60C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FA20721-8C43-407A-8134-29B323FA60C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FA20721-8C43-407A-8134-29B323FA60C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FA20721-8C43-407A-8134-29B323FA60C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

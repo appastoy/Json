@@ -1,4 +1,4 @@
-﻿namespace AppAsToy.Json.Conversion.Formatters;
+﻿namespace AppAsToy.Json.Conversion.Formatters.Primitives;
 
 #pragma warning disable CS8767
 

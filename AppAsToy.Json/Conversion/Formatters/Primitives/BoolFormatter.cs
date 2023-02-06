@@ -1,4 +1,4 @@
-﻿namespace AppAsToy.Json.Conversion.Formatters;
+﻿namespace AppAsToy.Json.Conversion.Formatters.Primitives;
 
 internal sealed class BoolFormatter : IFormatter<bool>
 {

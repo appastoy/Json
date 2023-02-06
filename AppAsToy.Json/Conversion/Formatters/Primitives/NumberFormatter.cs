@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace AppAsToy.Json.Conversion.Formatters;
+namespace AppAsToy.Json.Conversion.Formatters.Primitives;
 
 internal abstract class NumberFormatter<T> : IFormatter<T>
     where T : struct, IConvertible, IEquatable<T>

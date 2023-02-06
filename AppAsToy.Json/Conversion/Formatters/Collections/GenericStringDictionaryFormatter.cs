@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
 
-namespace AppAsToy.Json.Conversion.Formatters;
-internal sealed class DictionaryFormatter<T> : 
-    SharedFormatter<Dictionary<string, T>, DictionaryFormatter<T>>,
-    IFormatter<Dictionary<string, T>>
+#pragma warning disable CS8765
+
+namespace AppAsToy.Json.Conversion.Formatters.Collections;
+
+public abstract class GenericStringDictionaryFormatter<TValue, TDictionary, TFormatter> :
+    SharedFormatter<TDictionary, TFormatter>
+    where TDictionary : class, IDictionary<string, TValue>, new()
+    where TFormatter : class, IFormatter<TDictionary>, new()
 {
-    public void Read(ref JReader reader, out Dictionary<string, T>? value)
+    public override void Read(ref JReader reader, out TDictionary? value)
     {
         if (!reader.ReadObject())
         {
@@ -13,16 +17,16 @@ internal sealed class DictionaryFormatter<T> :
             return;
         }
 
-        value = new Dictionary<string, T>();
-        while (reader.CanReadNextObjectItem())
+        value = new TDictionary();
+        while (reader.MoveNextObjectProperty())
         {
             var propertyName = reader.ReadPropertyName();
-            Formatter<T>.Shared.Read(ref reader, out var propertyValue);
+            Formatter<TValue>.Shared.Read(ref reader, out var propertyValue);
             value.Add(propertyName, propertyValue);
         }
     }
 
-    public void Write(ref JWriter writer, Dictionary<string, T>? value)
+    public override void Write(ref JWriter writer, TDictionary? value)
     {
         if (value == null)
         {
@@ -45,7 +49,7 @@ internal sealed class DictionaryFormatter<T> :
             else
                 writer.WriteComma();
             writer.WritePropertyName(kv.Key);
-            Formatter<T>.Shared.Write(ref writer, kv.Value);
+            Formatter<TValue>.Shared.Write(ref writer, kv.Value);
         }
         writer.WriteObjectEnd();
     }

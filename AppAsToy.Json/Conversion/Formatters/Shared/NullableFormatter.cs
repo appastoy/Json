@@ -1,10 +1,8 @@
-﻿namespace AppAsToy.Json.Conversion.Formatters;
-internal sealed class NullableFormatter<T> : 
-    SharedFormatter<T?, NullableFormatter<T>>,
-    IFormatter<T?>
+﻿namespace AppAsToy.Json.Conversion.Formatters.Shared;
+internal sealed class NullableFormatter<T> : SharedFormatter<T?, NullableFormatter<T>>
     where T : struct
 {
-    public void Read(ref JReader reader, out T? value)
+    public override void Read(ref JReader reader, out T? value)
     {
         if (reader.TryReadNull())
         {
@@ -17,7 +15,7 @@ internal sealed class NullableFormatter<T> :
         }
     }
 
-    public void Write(ref JWriter writer, T? value)
+    public override void Write(ref JWriter writer, T? value)
     {
         if (value.HasValue)
             Formatter<T>.Shared.Write(ref writer, value.Value);

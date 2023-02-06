@@ -89,7 +89,7 @@ public ref struct JReader
             _ => throw InvalidToken($"Can't read array. ('{ch}'({((int)ch).ToString()}))")
         };
     }
-    public bool CanReadNextArrayItem()
+    public bool MoveNextArrayItem()
     {
         return CanReadNextCollectionItem(']');
     }
@@ -103,7 +103,7 @@ public ref struct JReader
             _ => throw InvalidToken($"Can't read object. ('{ch}'({((int)ch).ToString()}))")
         };
     }
-    public bool CanReadNextObjectItem()
+    public bool MoveNextObjectProperty()
     {
         return CanReadNextCollectionItem('}');
     }
