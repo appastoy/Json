@@ -115,7 +115,11 @@ internal sealed class PrimitiveResolver : IFormatterResolver
 
     public IFormatter<T>? Resolve<T>()
     {
-        return formatterMap.TryGetValue(typeof(T), out var formatter)
+        var type = typeof(T);
+        if (type.IsEnum)
+            return EnumFormatter<T>.Shared;
+
+        return formatterMap.TryGetValue(type, out var formatter)
             ? (IFormatter<T>)formatter
             : null;
     }
