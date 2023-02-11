@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace AppAsToy.Json.Conversion.Formatters.Shared;
+namespace AppAsToy.Json.Conversion.Formatters;
 
-internal abstract class TupleFormatterBase<TTuple, TFormmater> : SharedFormatter<TTuple, TFormmater>
-    where TTuple : class, ITuple
-    where TFormmater : class, IFormatter<TTuple>, new()
+internal abstract class ValueTupleFormatterBase<TValueTuple, TFormmater> : SharedFormatter<TValueTuple, TFormmater>
+    where TValueTuple : struct, ITuple
+    where TFormmater : class, IFormatter<TValueTuple>, new()
 {
     public T GetItem<T>(ref JReader reader)
     {
         if (!reader.MoveNextArrayItem())
-            throw new Exception($"{typeof(TTuple).Name} item not found");
+            throw new Exception($"{typeof(TValueTuple).Name} item not found");
 
         Formatter<T>.Shared.Read(ref reader, out var item);
         return item;
@@ -18,21 +18,21 @@ internal abstract class TupleFormatterBase<TTuple, TFormmater> : SharedFormatter
     public void CheckEnd(ref JReader reader)
     {
         if (reader.MoveNextArrayItem())
-            throw new Exception($"{typeof(TTuple).Name} has too many items.");
+            throw new Exception($"{typeof(TValueTuple).Name} has too many items.");
     }
 }
 
-internal sealed class TupleFormatter<T> : TupleFormatterBase<Tuple<T>, TupleFormatter<T>>
+internal sealed class ValueTupleFormatter<T> : ValueTupleFormatterBase<ValueTuple<T>, ValueTupleFormatter<T>>
 {
 
-    public override void Read(ref JReader reader, out Tuple<T> value)
+    public override void Read(ref JReader reader, out ValueTuple<T> value)
     {
         reader.ReadArray();
         value = new(GetItem<T>(ref reader));
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T> value)
+    public override void Write(ref JWriter writer, ValueTuple<T> value)
     {
         writer.WriteArrayStart();
         Formatter<T>.Shared.Write(ref writer, value.Item1);
@@ -40,9 +40,9 @@ internal sealed class TupleFormatter<T> : TupleFormatterBase<Tuple<T>, TupleForm
     }
 }
 
-internal sealed class TupleFormatter<T1, T2> : TupleFormatterBase<Tuple<T1, T2>, TupleFormatter<T1, T2>>
+internal sealed class ValueTupleFormatter<T1, T2> : ValueTupleFormatterBase<ValueTuple<T1, T2>, ValueTupleFormatter<T1, T2>>
 {
-    public override void Read(ref JReader reader, out Tuple<T1, T2> value)
+    public override void Read(ref JReader reader, out ValueTuple<T1, T2> value)
     {
         reader.ReadArray();
         value = new(GetItem<T1>(ref reader),
@@ -50,7 +50,7 @@ internal sealed class TupleFormatter<T1, T2> : TupleFormatterBase<Tuple<T1, T2>,
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T1, T2> value)
+    public override void Write(ref JWriter writer, ValueTuple<T1, T2> value)
     {
         writer.WriteArrayStart();
         Formatter<T1>.Shared.Write(ref writer, value.Item1);
@@ -59,9 +59,9 @@ internal sealed class TupleFormatter<T1, T2> : TupleFormatterBase<Tuple<T1, T2>,
     }
 }
 
-internal sealed class TupleFormatter<T1, T2, T3> : TupleFormatterBase<Tuple<T1, T2, T3>, TupleFormatter<T1, T2, T3>>
+internal sealed class ValueTupleFormatter<T1, T2, T3> : ValueTupleFormatterBase<ValueTuple<T1, T2, T3>, ValueTupleFormatter<T1, T2, T3>>
 {
-    public override void Read(ref JReader reader, out Tuple<T1, T2, T3> value)
+    public override void Read(ref JReader reader, out ValueTuple<T1, T2, T3> value)
     {
         reader.ReadArray();
         value = new(GetItem<T1>(ref reader),
@@ -70,7 +70,7 @@ internal sealed class TupleFormatter<T1, T2, T3> : TupleFormatterBase<Tuple<T1, 
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T1, T2, T3> value)
+    public override void Write(ref JWriter writer, ValueTuple<T1, T2, T3> value)
     {
         writer.WriteArrayStart();
         Formatter<T1>.Shared.Write(ref writer, value.Item1);
@@ -80,9 +80,9 @@ internal sealed class TupleFormatter<T1, T2, T3> : TupleFormatterBase<Tuple<T1, 
     }
 }
 
-internal sealed class TupleFormatter<T1, T2, T3, T4> : TupleFormatterBase<Tuple<T1, T2, T3, T4>, TupleFormatter<T1, T2, T3, T4>>
+internal sealed class ValueTupleFormatter<T1, T2, T3, T4> : ValueTupleFormatterBase<ValueTuple<T1, T2, T3, T4>, ValueTupleFormatter<T1, T2, T3, T4>>
 {
-    public override void Read(ref JReader reader, out Tuple<T1, T2, T3, T4> value)
+    public override void Read(ref JReader reader, out ValueTuple<T1, T2, T3, T4> value)
     {
         reader.ReadArray();
         value = new(GetItem<T1>(ref reader),
@@ -92,7 +92,7 @@ internal sealed class TupleFormatter<T1, T2, T3, T4> : TupleFormatterBase<Tuple<
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T1, T2, T3, T4> value)
+    public override void Write(ref JWriter writer, ValueTuple<T1, T2, T3, T4> value)
     {
         writer.WriteArrayStart();
         Formatter<T1>.Shared.Write(ref writer, value.Item1);
@@ -103,9 +103,9 @@ internal sealed class TupleFormatter<T1, T2, T3, T4> : TupleFormatterBase<Tuple<
     }
 }
 
-internal sealed class TupleFormatter<T1, T2, T3, T4, T5> : TupleFormatterBase<Tuple<T1, T2, T3, T4, T5>, TupleFormatter<T1, T2, T3, T4, T5>>
+internal sealed class ValueTupleFormatter<T1, T2, T3, T4, T5> : ValueTupleFormatterBase<ValueTuple<T1, T2, T3, T4, T5>, ValueTupleFormatter<T1, T2, T3, T4, T5>>
 {
-    public override void Read(ref JReader reader, out Tuple<T1, T2, T3, T4, T5> value)
+    public override void Read(ref JReader reader, out ValueTuple<T1, T2, T3, T4, T5> value)
     {
         reader.ReadArray();
         value = new(GetItem<T1>(ref reader),
@@ -116,7 +116,7 @@ internal sealed class TupleFormatter<T1, T2, T3, T4, T5> : TupleFormatterBase<Tu
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T1, T2, T3, T4, T5> value)
+    public override void Write(ref JWriter writer, ValueTuple<T1, T2, T3, T4, T5> value)
     {
         writer.WriteArrayStart();
         Formatter<T1>.Shared.Write(ref writer, value.Item1);
@@ -128,9 +128,9 @@ internal sealed class TupleFormatter<T1, T2, T3, T4, T5> : TupleFormatterBase<Tu
     }
 }
 
-internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6> : TupleFormatterBase<Tuple<T1, T2, T3, T4, T5, T6>, TupleFormatter<T1, T2, T3, T4, T5, T6>>
+internal sealed class ValueTupleFormatter<T1, T2, T3, T4, T5, T6> : ValueTupleFormatterBase<ValueTuple<T1, T2, T3, T4, T5, T6>, ValueTupleFormatter<T1, T2, T3, T4, T5, T6>>
 {
-    public override void Read(ref JReader reader, out Tuple<T1, T2, T3, T4, T5, T6> value)
+    public override void Read(ref JReader reader, out ValueTuple<T1, T2, T3, T4, T5, T6> value)
     {
         reader.ReadArray();
         value = new(GetItem<T1>(ref reader),
@@ -142,7 +142,7 @@ internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6> : TupleFormatterBas
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T1, T2, T3, T4, T5, T6> value)
+    public override void Write(ref JWriter writer, ValueTuple<T1, T2, T3, T4, T5, T6> value)
     {
         writer.WriteArrayStart();
         Formatter<T1>.Shared.Write(ref writer, value.Item1);
@@ -155,9 +155,9 @@ internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6> : TupleFormatterBas
     }
 }
 
-internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6, T7> : TupleFormatterBase<Tuple<T1, T2, T3, T4, T5, T6, T7>, TupleFormatter<T1, T2, T3, T4, T5, T6, T7>>
+internal sealed class ValueTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : ValueTupleFormatterBase<ValueTuple<T1, T2, T3, T4, T5, T6, T7>, ValueTupleFormatter<T1, T2, T3, T4, T5, T6, T7>>
 {
-    public override void Read(ref JReader reader, out Tuple<T1, T2, T3, T4, T5, T6, T7> value)
+    public override void Read(ref JReader reader, out ValueTuple<T1, T2, T3, T4, T5, T6, T7> value)
     {
         reader.ReadArray();
         value = new(GetItem<T1>(ref reader),
@@ -170,7 +170,7 @@ internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6, T7> : TupleFormatte
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T1, T2, T3, T4, T5, T6, T7> value)
+    public override void Write(ref JWriter writer, ValueTuple<T1, T2, T3, T4, T5, T6, T7> value)
     {
         writer.WriteArrayStart();
         Formatter<T1>.Shared.Write(ref writer, value.Item1);
@@ -184,9 +184,10 @@ internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6, T7> : TupleFormatte
     }
 }
 
-internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : TupleFormatterBase<Tuple<T1, T2, T3, T4, T5, T6, T7, TRest>, TupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest>>
+internal sealed class ValueTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : ValueTupleFormatterBase<ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest>, ValueTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest>>
+    where TRest : struct
 {
-    public override void Read(ref JReader reader, out Tuple<T1, T2, T3, T4, T5, T6, T7, TRest> value)
+    public override void Read(ref JReader reader, out ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest> value)
     {
         reader.ReadArray();
         value = new(GetItem<T1>(ref reader),
@@ -200,7 +201,7 @@ internal sealed class TupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : TupleF
         CheckEnd(ref reader);
     }
 
-    public override void Write(ref JWriter writer, Tuple<T1, T2, T3, T4, T5, T6, T7, TRest> value)
+    public override void Write(ref JWriter writer, ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest> value)
     {
         writer.WriteArrayStart();
         Formatter<T1>.Shared.Write(ref writer, value.Item1);

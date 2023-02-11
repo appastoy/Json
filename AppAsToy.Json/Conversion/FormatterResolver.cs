@@ -4,9 +4,11 @@ using System;
 namespace AppAsToy.Json.Conversion;
 public static class FormatterResolver
 {
-    private static readonly IFormatterResolver[] _formatterProviders = new []
+    private static readonly IFormatterResolver[] _formatterProviders = new IFormatterResolver[]
     {
-        new PrimitiveResolver()
+        new PrimitiveResolver(),
+        new CollectionResolver(),
+        new TupleResolver(),
     };
 
     public static IFormatter<T> Resolve<T>()

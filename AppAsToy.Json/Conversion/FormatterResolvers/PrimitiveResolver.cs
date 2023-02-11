@@ -1,6 +1,6 @@
-﻿using AppAsToy.Json.Conversion.Formatters.Collections;
+﻿using AppAsToy.Json.Conversion.Formatters;
+using AppAsToy.Json.Conversion.Formatters.Collections;
 using AppAsToy.Json.Conversion.Formatters.Primitives;
-using AppAsToy.Json.Conversion.Formatters.Shared;
 using System;
 using System.Collections.Generic;
 

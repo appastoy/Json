@@ -1,4 +1,4 @@
-﻿namespace AppAsToy.Json.Conversion.Formatters.Shared;
+﻿namespace AppAsToy.Json.Conversion.Formatters;
 internal sealed class NullableFormatter<T> : SharedFormatter<T?, NullableFormatter<T>>
     where T : struct
 {
