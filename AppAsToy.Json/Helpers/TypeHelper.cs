@@ -32,4 +32,22 @@ internal static class TypeHelper
     {
         return genericTypeDefinition.MakeGenericType(genericArguments).GetSharedFormatter<T>();
     }
+
+    public static IEnumerable<Type> EnumerateWithBaseTypes(this Type type, bool includeSelf = true) 
+    {
+        if (type == null)
+            throw new NullReferenceException(nameof(type));
+
+        var currentType = includeSelf ? type : type.BaseType;
+        while (currentType != null && currentType != typeof(object)) 
+        {
+            yield return currentType;
+            currentType = currentType.BaseType;
+        }
+    }
+
+    public static IEnumerable<Type> EnumerateWithBaseTypesReverse(this Type type, bool includeSelf = true)
+    {
+        return EnumerateWithBaseTypes(type, includeSelf).Reverse();
+    }
 }

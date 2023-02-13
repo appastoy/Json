@@ -33,7 +33,7 @@ public static class JConvert
         if (json == null)
             throw new ArgumentNullException(nameof(json));
 
-        return null;
+        return default;
     }
 
     public static bool TryDeserialize<T>(string json, out T? value)
